@@ -1,3 +1,5 @@
+![eva-header](https://github.com/user-attachments/assets/ee685bf2-d743-4004-9aa2-7860f34f458e)
+
 # Project Eva
 Eva is an Android music player that brings the nostalgic charm of Winamp classic skins to your mobile device. Relive the glory days of digital music with a modern twist!
 
