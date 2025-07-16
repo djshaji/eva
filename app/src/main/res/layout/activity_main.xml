@@ -8,24 +8,22 @@
     tools:context=".MainActivity">
 
     <include
+        android:layout_width="match_parent"
+        android:layout_height="175dp"
         layout="@layout/main_window"
         android:id="@+id/main_window"/>
 
-    <ImageView
-        android:layout_width="match_parent"
-        android:layout_height="175dp"
-        android:src="@drawable/equalizer"
-        android:id="@+id/equalizer"
-        app:layout_constraintTop_toBottomOf="@id/main_window"
-        app:layout_constraintLeft_toLeftOf="parent"/>
+    <include
+        android:id="@+id/equalizer_window"
+        layout="@layout/equalizer_window"
+        app:layout_constraintTop_toTopOf="@id/main_window"
+        app:layout_editor_absoluteY="176dp" />
 
-    <ImageView
-        android:layout_width="match_parent"
-        android:layout_height="175dp"
-        android:src="@drawable/playlist"
-        android:id="@+id/playlist"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/equalizer"
-        app:layout_constraintLeft_toLeftOf="parent"/>
+    <include
+        android:id="@+id/playlist_window"
+        layout="@layout/playlist_window"
+        app:layout_constraintTop_toBottomOf="@id/equalizer_window"
+        app:layout_constraintBottom_toBottomOf="parent"/>
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>
