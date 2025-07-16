@@ -11,9 +11,36 @@
         android:id="@+id/equalizer"
         android:layout_width="match_parent"
         android:layout_height="175dp"
-        android:layout_marginLeft="16dp"
-        android:src="@drawable/equalizer"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:src="@drawable/equalizer"/>
+
+    <ToggleButton
+        android:textOff=""
+        android:textOn=""
+        android:text=""
+        android:id="@+id/toggleButton"
+        android:layout_width="37dp"
+        android:layout_height="19dp"
+        android:background="@color/beige"
+        tools:layout_editor_absoluteX="21dp"
+        tools:layout_editor_absoluteY="28dp" />
+
+    <ToggleButton
+        android:id="@+id/toggleButton"
+        android:layout_width="49dp"
+        android:layout_height="19dp"
+        android:background="@color/beige"
+        android:text=""
+        android:textOff=""
+        android:textOn=""
+        tools:layout_editor_absoluteX="60dp"
+        tools:layout_editor_absoluteY="28dp" />
+
+    <SeekBar
+        android:id="@+id/preamp"
+        android:layout_width="16dp"
+        android:layout_height="94dp"
+        android:rotation="270"
+        tools:layout_editor_absoluteX="33dp"
+        tools:layout_editor_absoluteY="57dp" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
