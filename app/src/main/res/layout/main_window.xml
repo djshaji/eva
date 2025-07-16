@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/root_main"
+    android:layout_width="match_parent"
+    android:layout_height="175dp"
+    tools:context=".MainActivity">
+
+<ImageView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/main"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        android:src="@drawable/main_window"/>
+
+    <TextView
+        android:id="@+id/clock"
+        android:layout_width="137dp"
+        android:layout_height="30dp"
+        android:layout_marginLeft="16dp"
+        android:layout_marginTop="36dp"
+        android:background="@color/black"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ProgressBar
+        android:id="@+id/spectrum"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="134dp"
+        android:layout_height="28dp"
+        android:background="@color/dark_blue"
+        tools:layout_editor_absoluteX="19dp"
+        tools:layout_editor_absoluteY="67dp" />
+
+    <TextView
+        android:id="@+id/title"
+        android:layout_width="232dp"
+        android:layout_height="15dp"
+        android:background="@color/black"
+        tools:layout_editor_absoluteX="164dp"
+        tools:layout_editor_absoluteY="37dp" />
+
+    <TextView
+        android:id="@+id/bitrate"
+        android:layout_width="24dp"
+        android:layout_height="15dp"
+        android:background="@color/black"
+        tools:layout_editor_absoluteX="164dp"
+        tools:layout_editor_absoluteY="61dp" />
+
+    <TextView
+        android:id="@+id/samplerate"
+        android:layout_width="16dp"
+        android:layout_height="13dp"
+        android:background="@color/black"
+        tools:layout_editor_absoluteX="231dp"
+        tools:layout_editor_absoluteY="63dp" />
+
+    <SeekBar
+        android:id="@+id/seekBar"
+        android:layout_width="369dp"
+        android:layout_height="15dp"
+        tools:layout_editor_absoluteX="26dp"
+        tools:layout_editor_absoluteY="107dp" />
+
+    <SeekBar
+        android:id="@+id/volume"
+        android:layout_width="94dp"
+        android:layout_height="17dp"
+        tools:layout_editor_absoluteX="164dp"
+        tools:layout_editor_absoluteY="86dp" />
+
+    <SeekBar
+        android:id="@+id/balance"
+        android:layout_width="59dp"
+        android:layout_height="17dp"
+        tools:layout_editor_absoluteX="264dp"
+        tools:layout_editor_absoluteY="86dp" />
+
+    <ToggleButton
+        android:id="@+id/toggle_eq"
+        android:layout_width="32dp"
+        android:layout_height="17dp"
+        android:text="ToggleButton"
+        tools:layout_editor_absoluteX="327dp"
+        tools:layout_editor_absoluteY="86dp" />
+
+    <ToggleButton
+        android:id="@+id/toggle_playlist"
+        android:layout_width="32dp"
+        android:layout_height="16dp"
+        android:text="ToggleButton"
+        tools:layout_editor_absoluteX="362dp"
+        tools:layout_editor_absoluteY="87dp" />
+
+    <ToggleButton
+        android:id="@+id/shuffle"
+        android:layout_width="67dp"
+        android:layout_height="20dp"
+        android:text="ToggleButton"
+        tools:layout_editor_absoluteX="246dp"
+        tools:layout_editor_absoluteY="134dp" />
+
+    <ToggleButton
+        android:id="@+id/repeat"
+        android:layout_width="40dp"
+        android:layout_height="20dp"
+        tools:layout_editor_absoluteX="316dp"
+        tools:layout_editor_absoluteY="135dp" />
+
+    <Button
+        android:id="@+id/prev"
+        android:layout_width="33dp"
+        android:layout_height="26dp"
+        android:background="@color/wheat"
+        tools:layout_editor_absoluteX="24dp"
+        tools:layout_editor_absoluteY="131dp" />
+
+    <Button
+        android:id="@+id/play"
+        android:layout_width="33dp"
+        android:layout_height="26dp"
+        android:background="@color/wheat"
+        tools:layout_editor_absoluteX="58dp"
+        tools:layout_editor_absoluteY="131dp" />
+
+    <Button
+        android:id="@+id/pause"
+        android:layout_width="34dp"
+        android:layout_height="26dp"
+        android:background="@color/wheat"
+        tools:layout_editor_absoluteX="92dp"
+        tools:layout_editor_absoluteY="131dp" />
+    <Button
+        android:id="@+id/stop"
+        android:layout_width="33dp"
+        android:layout_height="26dp"
+        android:background="@color/wheat"
+        tools:layout_editor_absoluteX="127dp"
+        tools:layout_editor_absoluteY="131dp" />
+    <Button
+        android:id="@+id/next"
+        android:layout_width="33dp"
+        android:layout_height="26dp"
+        android:background="@color/wheat"
+        tools:layout_editor_absoluteX="161dp"
+        tools:layout_editor_absoluteY="131dp" />
+
+    <Button
+        android:id="@+id/eject"
+        android:layout_width="33dp"
+        android:layout_height="26dp"
+        android:background="@color/wheat"
+        tools:layout_editor_absoluteX="203dp"
+        tools:layout_editor_absoluteY="131dp" />
+
+    <Button
+        android:id="@+id/logo"
+        android:layout_width="31dp"
+        android:layout_height="30dp"
+        android:background="@android:color/transparent"
+        tools:layout_editor_absoluteX="368dp"
+        tools:layout_editor_absoluteY="131dp" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>
