@@ -72,9 +72,6 @@ public class Skin {
     }
 
     void main () {
-        ImageView bg = mainActivity.findViewById(R.id.main);
-        bg.setImageDrawable(skin.get("main_window.jpg"));
-        bg.setMaxHeight((int) (116 * scale));
     }
 
     public void load () {
