@@ -4,6 +4,7 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 
 import android.widget.AbsoluteLayout;
 import android.widget.Button;
+import android.widget.GridLayout;
 import android.widget.SeekBar;
 import android.widget.ToggleButton;
 
@@ -13,7 +14,7 @@ public class UI {
     ToggleButton shuffle, repeat, toggle_playlist, toggle_eq ;
     SeekBar seekBar, volume, balance ;
 
-    AbsoluteLayout mainWindow ;
+    GridLayout mainWindow ;
 
     UI (MainActivity _mainActivity) {
         mainActivity = _mainActivity;
@@ -22,11 +23,6 @@ public class UI {
 
     public void create () {
         prev = new Button(mainActivity);
-        mainWindow.addView(prev);
-        ConstraintLayout.LayoutParams params = (ConstraintLayout.LayoutParams) prev.getLayoutParams();
-        params.topMargin = (int) (88 * mainActivity.skin.scale);
-        params.leftMargin = (int) (16 * mainActivity.skin.scale);
-        prev.setLayoutParams(params);
-
+        Button b = mainActivity.findViewById(R.id.bmin);
     }
 }
