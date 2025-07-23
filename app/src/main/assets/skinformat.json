@@ -1,0 +1,350 @@
+{
+  "main_window": {
+    "background": {
+      "coordinates": [0, 0, 275, 116],
+      "source": "main.bmp",
+      "source_rect": [0, 0, 275, 116],
+      "notes": "Main UI area"
+    },
+    "title_bar": {
+      "coordinates": [0, 0, 275, 14],
+      "source": "titlebar.bmp",
+      "source_rects": {
+        "unshaded_focused": [27, 0, 275, 14],
+        "unshaded_unfocused": [27, 15, 275, 14],
+        "shaded_focused": [27, 29, 275, 14],
+        "shaded_unfocused": [27, 42, 275, 14]
+      },
+      "notes": "4 states via vertical offsets"
+    },
+    "control_buttons": [
+      {
+        "name": "Close",
+        "coordinates": [255, 3, 23, 12],
+        "source": "main.bmp",
+        "source_rect": [232, 3, 23, 12]
+      },
+      {
+        "name": "Minimize",
+        "coordinates": [240, 3, 23, 12],
+        "source": "main.bmp",
+        "source_rect": [209, 3, 23, 12]
+      },
+      {
+        "name": "Shade",
+        "coordinates": [225, 3, 23, 12],
+        "source": "main.bmp",
+        "source_rect": [186, 3, 23, 12]
+      }
+    ],
+    "main_display": [
+      {
+        "name": "Equalizer Button",
+        "coordinates": [22, 3, 23, 12],
+        "source": "main.bmp",
+        "source_rect": [22, 3, 23, 12]
+      },
+      {
+        "name": "Playlist Button",
+        "coordinates": [46, 3, 23, 12],
+        "source": "main.bmp",
+        "source_rect": [46, 3, 23, 12]
+      },
+      {
+        "name": "Shuffle",
+        "coordinates": [164, 89, 22, 13],
+        "source": "shufrep.bmp",
+        "source_rect": [0, 0, 22, 13]
+      },
+      {
+        "name": "Repeat",
+        "coordinates": [186, 89, 22, 13],
+        "source": "shufrep.bmp",
+        "source_rect": [22, 0, 22, 13]
+      },
+      {
+        "name": "Volume Bar",
+        "coordinates": [107, 57, 68, 13],
+        "source": "volume.bmp",
+        "source_rect": [0, 0, 68, 13]
+      },
+      {
+        "name": "Balance Bar",
+        "coordinates": [177, 57, 38, 13],
+        "source": "balance.bmp",
+        "source_rect": [0, 0, 38, 13]
+      },
+      {
+        "name": "Visualization",
+        "coordinates": [24, 43, 150, 32],
+        "source": "main.bmp",
+        "source_rect": [24, 43, 150, 32]
+      },
+      {
+        "name": "Song Time Digits",
+        "coordinates": [16, 27, 49, 13],
+        "source": "nums_ex.bmp",
+        "source_rect": [0, 0, 49, 13]
+      },
+      {
+        "name": "Song Title",
+        "coordinates": [70, 27, 155, 13],
+        "source": "text.bmp",
+        "source_rect": [0, 0, 155, 13]
+      }
+    ],
+    "playback_controls": [
+      {
+        "name": "Previous",
+        "coordinates": [93, 88, 23, 18],
+        "source": "cbuttons.bmp",
+        "source_rect": [0, 0, 23, 18]
+      },
+      {
+        "name": "Play",
+        "coordinates": [116, 88, 23, 18],
+        "source": "cbuttons.bmp",
+        "source_rect": [23, 0, 23, 18]
+      },
+      {
+        "name": "Pause",
+        "coordinates": [139, 88, 23, 18],
+        "source": "cbuttons.bmp",
+        "source_rect": [46, 0, 23, 18]
+      },
+      {
+        "name": "Stop",
+        "coordinates": [162, 88, 23, 18],
+        "source": "cbuttons.bmp",
+        "source_rect": [69, 0, 23, 18]
+      },
+      {
+        "name": "Next",
+        "coordinates": [185, 88, 23, 18],
+        "source": "cbuttons.bmp",
+        "source_rect": [92, 0, 23, 18]
+      },
+      {
+        "name": "Eject",
+        "coordinates": [208, 88, 23, 18],
+        "source": "cbuttons.bmp",
+        "source_rect": [115, 0, 23, 18]
+      }
+    ],
+    "seek_bar": {
+      "coordinates": [16, 72, 240, 6],
+      "source": "posbar.bmp",
+      "source_rect": [0, 0, 240, 6],
+      "notes": "Position/progress bar"
+    },
+    "mono_stereo": {
+      "coordinates": [219, 43, 23, 12],
+      "source": "monoster.bmp",
+      "source_rect": [0, 0, 23, 12],
+      "notes": "Mono/stereo status"
+    },
+    "misc": [
+      {
+        "name": "Bitrate",
+        "coordinates": [111, 43, 30, 12],
+        "source": "main.bmp",
+        "source_rect": [111, 43, 30, 12]
+      },
+      {
+        "name": "Frequency",
+        "coordinates": [146, 43, 30, 12],
+        "source": "main.bmp",
+        "source_rect": [146, 43, 30, 12]
+      },
+      {
+        "name": "Play/Pause LED",
+        "coordinates": [161, 43, 9, 9],
+        "source": "playpaus.bmp",
+        "source_rect": [0, 0, 9, 9]
+      }
+    ]
+  },
+
+  "equalizer_window": {
+    "background": {
+      "coordinates": [0, 0, 275, 116],
+      "source": "eqmain.bmp",
+      "source_rect": [0, 0, 275, 116],
+      "notes": "Equalizer main background"
+    },
+    "title_bar": {
+      "coordinates": [0, 0, 275, 14],
+      "source": "eqmain.bmp",
+      "source_rect": [0, 0, 275, 14],
+      "notes": "Equalizer window title bar"
+    },
+    "slider_thumb": {
+      "source": "eqmain.bmp",
+      "source_rect": [0, 229, 15, 13],
+      "notes": "Shared slider thumb image for all EQ sliders"
+    },
+    "sliders": [
+      {
+        "name": "Preamp",
+        "coordinates": [20, 32, 15, 60],
+        "source": "eqmain.bmp",
+        "source_rect": [13, 164, 15, 60],
+        "slider_thumb_ref": "slider_thumb"
+      },
+      {
+        "name": "60Hz",
+        "coordinates": [40, 32, 15, 60],
+        "source": "eqmain.bmp",
+        "source_rect": [28, 164, 15, 60],
+        "slider_thumb_ref": "slider_thumb"
+      },
+      {
+        "name": "170Hz",
+        "coordinates": [60, 32, 15, 60],
+        "source": "eqmain.bmp",
+        "source_rect": [43, 164, 15, 60],
+        "slider_thumb_ref": "slider_thumb"
+      },
+      {
+        "name": "310Hz",
+        "coordinates": [80, 32, 15, 60],
+        "source": "eqmain.bmp",
+        "source_rect": [58, 164, 15, 60],
+        "slider_thumb_ref": "slider_thumb"
+      },
+      {
+        "name": "600Hz",
+        "coordinates": [100, 32, 15, 60],
+        "source": "eqmain.bmp",
+        "source_rect": [73, 164, 15, 60],
+        "slider_thumb_ref": "slider_thumb"
+      },
+      {
+        "name": "1kHz",
+        "coordinates": [120, 32, 15, 60],
+        "source": "eqmain.bmp",
+        "source_rect": [88, 164, 15, 60],
+        "slider_thumb_ref": "slider_thumb"
+      },
+      {
+        "name": "3kHz",
+        "coordinates": [140, 32, 15, 60],
+        "source": "eqmain.bmp",
+        "source_rect": [103, 164, 15, 60],
+        "slider_thumb_ref": "slider_thumb"
+      },
+      {
+        "name": "6kHz",
+        "coordinates": [160, 32, 15, 60],
+        "source": "eqmain.bmp",
+        "source_rect": [118, 164, 15, 60],
+        "slider_thumb_ref": "slider_thumb"
+      },
+      {
+        "name": "12kHz",
+        "coordinates": [180, 32, 15, 60],
+        "source": "eqmain.bmp",
+        "source_rect": [133, 164, 15, 60],
+        "slider_thumb_ref": "slider_thumb"
+      },
+      {
+        "name": "14kHz",
+        "coordinates": [200, 32, 15, 60],
+        "source": "eqmain.bmp",
+        "source_rect": [148, 164, 15, 60],
+        "slider_thumb_ref": "slider_thumb"
+      },
+      {
+        "name": "16kHz",
+        "coordinates": [220, 32, 15, 60],
+        "source": "eqmain.bmp",
+        "source_rect": [163, 164, 15, 60],
+        "slider_thumb_ref": "slider_thumb"
+      }
+    ],
+    "on_off_button": {
+      "coordinates": [20, 10, 25, 12],
+      "source": "eq_ex.bmp",
+      "source_rect": [0, 0, 25, 12],
+      "notes": "EQ ON/OFF button"
+    },
+    "auto_button": {
+      "coordinates": [50, 10, 25, 12],
+      "source": "eq_ex.bmp",
+      "source_rect": [25, 0, 25, 12],
+      "notes": "EQ AUTO button"
+    },
+    "presets_button": {
+      "coordinates": [80, 10, 25, 12],
+      "source": "eq_ex.bmp",
+      "source_rect": [50, 0, 25, 12],
+      "notes": "EQ Presets button"
+    }
+  },
+  
+  "playlist_window": {
+    "background": {
+      "coordinates": [0, 0, 275, 116],
+      "source": "pledit.bmp",
+      "pattern": {
+        "list_entry_tile": {
+          "source_rect": [0, 27, 232, 12],
+          "repeat": "vertical",
+          "notes": "This row is tiled vertically for the playlist entries area."
+        }
+      },
+      "notes": "Playlist main background with vertically repeating list entry tiles."
+    },
+    "title_bar": {
+      "coordinates": [0, 0, 232, 20],
+      "source": "pledit.bmp",
+      "source_rect": [0, 0, 232, 20],
+      "notes": "Playlist window title bar"
+    },
+    "buttons": [
+      {
+        "name": "Close",
+        "coordinates": [217, 4, 9, 9],
+        "source": "pledit.bmp",
+        "source_rect": [232, 58, 9, 9]
+      },
+      {
+        "name": "Shade",
+        "coordinates": [207, 4, 9, 9],
+        "source": "pledit.bmp",
+        "source_rect": [241, 58, 9, 9]
+      }
+    ],
+    "scrollbar": {
+      "coordinates": [232, 20, 13, 68],
+      "source": "pledit.bmp",
+      "components": {
+        "up_arrow": {
+          "coordinates": [232, 20, 13, 13],
+          "source_rect": [232, 0, 13, 13]
+        },
+        "down_arrow": {
+          "coordinates": [232, 75, 13, 13],
+          "source_rect": [232, 13, 13, 13]
+        },
+        "slider": {
+          "coordinates": [232, 33, 13, 42],
+          "source_rect": [232, 26, 13, 42],
+          "notes": "Slider knob; moves vertically."
+        },
+        "track": {
+          "coordinates": [232, 20, 13, 68],
+          "source_rect": [245, 0, 13, 68],
+          "pattern": "vertical"
+        }
+      },
+      "notes": "Custom vertical scrollbar for playlist"
+    },
+    "list_area": {
+      "coordinates": [0, 20, 232, 68],
+      "pattern_tile_source_rect": [0, 27, 232, 12],
+      "repeat": "vertical",
+      "notes": "Playlist entries are drawn over this tiled area"
+    }
+  }
+}
