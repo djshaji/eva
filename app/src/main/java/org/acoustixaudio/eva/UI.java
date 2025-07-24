@@ -92,6 +92,9 @@ public class UI {
     public void create () throws JSONException {
         mainWindow = (ImageView) createView(skinFormat.getJSONObject("main_window").getJSONObject("background"));
         mainActivity.root.addView(mainWindow);
+        ImageView titleBar = (ImageView) createView(skinFormat.getJSONObject("main_window").getJSONObject("title_bar"));
+        mainActivity.root.addView(titleBar);
+
 
     }
 }

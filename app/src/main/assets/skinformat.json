@@ -9,7 +9,9 @@
     },
     "title_bar": {
       "coordinates": [0, 0, 275, 14],
+      "type": "image",
       "source": "titlebar.bmp",
+      "source_rect": [27, 0, 275, 14],
       "source_rects": {
         "unshaded_focused": [27, 0, 275, 14],
         "unshaded_unfocused": [27, 15, 275, 14],
