@@ -1,6 +1,7 @@
 {
   "main_window": {
     "background": {
+      "type": "image",
       "coordinates": [0, 0, 275, 116],
       "source": "main.bmp",
       "source_rect": [0, 0, 275, 116],

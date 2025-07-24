@@ -9,10 +9,13 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import org.json.JSONException;
+
 public class MainActivity extends AppCompatActivity {
     Skin skin ;
     org.acoustixaudio.eva.UI ui ;
     public ConstraintLayout root ;
+    Utils utils = new Utils(this);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,9 +31,13 @@ public class MainActivity extends AppCompatActivity {
             return insets;
         });
 
-        ui.create();
-
         skin.reset () ;
+        try {
+            ui.create();
+        } catch (JSONException e) {
+            throw new RuntimeException(e);
+        }
+
         skin.load ();
     }
 }
