@@ -5,11 +5,12 @@
       "coordinates": [0, 0, 275, 116],
       "source": "main.bmp",
       "source_rect": [0, 0, 275, 116],
-      "notes": "Main UI area"
+      "name": "Main UI area"
     },
     "title_bar": {
       "coordinates": [0, 0, 275, 14],
       "type": "image",
+      "name": "Title bar",
       "source": "titlebar.bmp",
       "source_rect": [27, 0, 275, 14],
       "source_rects": {
@@ -20,13 +21,22 @@
       },
       "notes": "4 states via vertical offsets"
     },
+    "close": {
+      "name": "Close",
+      "type": "button",
+      "coordinates": [255, 3, 23, 12],
+      "source": "main.bmp",
+      "source_rect": [232, 3, 23, 12]
+    },
+    "eq_button": {
+      "name": "Equalizer Button",
+      "coordinates": [22, 3, 23, 12],
+      "source": "main.bmp",
+      "type": "button",
+      "source_rect": [0, 102, 23, 12]
+    },
+
     "control_buttons": [
-      {
-        "name": "Close",
-        "coordinates": [255, 3, 23, 12],
-        "source": "main.bmp",
-        "source_rect": [232, 3, 23, 12]
-      },
       {
         "name": "Minimize",
         "coordinates": [240, 3, 23, 12],
@@ -41,12 +51,6 @@
       }
     ],
     "main_display": [
-      {
-        "name": "Equalizer Button",
-        "coordinates": [22, 3, 23, 12],
-        "source": "main.bmp",
-        "source_rect": [22, 3, 23, 12]
-      },
       {
         "name": "Playlist Button",
         "coordinates": [46, 3, 23, 12],
