@@ -47,7 +47,7 @@ public class UI {
             case "seekbar":
                 view = new SeekBar(mainActivity) ;
                 break ;
-            case "togglebutton":
+            case "toggle":
                 view = new ToggleButton(mainActivity) ;
                 break ;
             case "image":
@@ -113,7 +113,22 @@ public class UI {
 
         Button mainClose = (Button) createView(skinFormat.getJSONObject("main_window").getJSONObject("close"));
 //        mainActivity.root.addView(mainClose);
-        Button eq_button = (Button) createView(skinFormat.getJSONObject("main_window").getJSONObject("eq_button"));
+        ToggleButton eq_button = (ToggleButton) createView(skinFormat.getJSONObject("main_window").getJSONObject("eq_button"));
         mainActivity.root.addView(eq_button);
+        ToggleButton pl_button = (ToggleButton) createView(skinFormat.getJSONObject("main_window").getJSONObject("pl_button"));
+        mainActivity.root.addView(pl_button);
+
+        Button prev = (Button) createView(skinFormat.getJSONObject("main_window").getJSONObject("prev"));
+        mainActivity.root.addView(prev);
+        Button play = (Button) createView(skinFormat.getJSONObject("main_window").getJSONObject("play"));
+        mainActivity.root.addView(play);
+        Button pause = (Button) createView(skinFormat.getJSONObject("main_window").getJSONObject("pause"));
+        mainActivity.root.addView(pause);
+        Button stop = (Button) createView(skinFormat.getJSONObject("main_window").getJSONObject("stop"));
+        mainActivity.root.addView(stop);
+        Button next = (Button) createView(skinFormat.getJSONObject("main_window").getJSONObject("next"));
+        mainActivity.root.addView(next);
+        Button eject = (Button) createView(skinFormat.getJSONObject("main_window").getJSONObject("eject"));
+        mainActivity.root.addView(eject);
     }
 }

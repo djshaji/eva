@@ -30,10 +30,64 @@
     },
     "eq_button": {
       "name": "Equalizer Button",
-      "coordinates": [22, 3, 23, 12],
-      "source": "main.bmp",
+      "coordinates": [219, 58, 23, 12],
+      "source": "shufrep.bmp",
+      "type": "toggle",
+      "source_rect": [0, 61, 23, 12],
+      "source_rect_toggle_on": [0, 73, 23, 12]
+    },
+
+    "pl_button": {
+      "name": "Playlist Button",
+      "coordinates": [242, 58, 23, 12],
+      "source": "shufrep.bmp",
+      "type": "toggle",
+      "source_rect": [23, 61, 23, 12],
+      "source_rect_toggle_on": [23, 73, 23, 12]
+    },
+
+    "prev": {
+      "name": "Prev Button",
+      "coordinates": [16, 88, 23, 18],
+      "source": "cbuttons.bmp",
       "type": "button",
-      "source_rect": [0, 102, 23, 12]
+      "source_rect": [0, 0, 23, 18]
+    },
+    "play": {
+      "name": "Play Button",
+      "coordinates": [39, 88, 23, 18],
+      "source": "cbuttons.bmp",
+      "type": "button",
+      "source_rect": [23, 0, 23, 18]
+    },
+    "pause": {
+      "name": "Prev Button",
+      "coordinates": [62, 88, 23, 18],
+      "source": "cbuttons.bmp",
+      "type": "button",
+      "source_rect": [46, 0, 23, 18]
+    },
+    "stop": {
+      "name": "Stop Button",
+      "coordinates": [85, 88, 23, 18],
+      "source": "cbuttons.bmp",
+      "type": "button",
+      "source_rect": [69, 0, 23, 18]
+    },
+    "next": {
+      "name": "Next Button",
+      "coordinates": [108, 88, 22, 18],
+      "source": "cbuttons.bmp",
+      "type": "button",
+      "source_rect": [92, 0, 22, 18]
+    },
+
+    "eject": {
+      "name": "Eject Button",
+      "coordinates": [136, 89, 22, 16],
+      "source": "cbuttons.bmp",
+      "type": "button",
+      "source_rect": [114, 0, 22, 16]
     },
 
     "control_buttons": [
