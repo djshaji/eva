@@ -13,11 +13,13 @@ import java.io.InputStream;
 import java.util.HashMap;
 
 public class Skin {
+    private static final String TAG = "EVA";
     MainActivity mainActivity ;
     AssetManager assets ;
     float scale = 1.0f;
     DisplayMetrics metrics ;
     HashMap <String, BitmapDrawable> skin = new HashMap<>();
+    HashMap <String, HashMap<Integer, Bitmap>> states ;
     String [] filenames = {
             "main_window.jpg",
         "balance.bmp",
@@ -72,9 +74,13 @@ public class Skin {
     }
 
     void main () {
+        // load skin here
+        reset();
     }
 
     public void load () {
+        Log.d(TAG, "load() called");
+        states = new HashMap<>();
         main();
     }
 

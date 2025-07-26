@@ -31,13 +31,11 @@ public class MainActivity extends AppCompatActivity {
             return insets;
         });
 
-        skin.reset () ;
+        skin.load () ;
         try {
             ui.create();
         } catch (JSONException e) {
             throw new RuntimeException(e);
         }
-
-        skin.load ();
     }
 }

@@ -20,6 +20,9 @@ import android.widget.GridLayout;
 import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.ToggleButton;
+
+import java.util.HashMap;
+import java.util.Objects;
 import java.util.Random;
 
 public class UI {
@@ -104,7 +107,7 @@ public class UI {
                 Log.d(TAG, String.format ("[bitmap size]: %d x %d", width, height));
                 view.setBackground(new android.graphics.drawable.BitmapDrawable(mainActivity.getResources(), scaledBitmap));
 
-                if (component.getString("type").equals("seekbar")) {
+                if (component.has("bg") && component.getBoolean("bg")) {
                     assert view instanceof SeekBar;
                     SeekBar seekBar = (SeekBar) view;
                     JSONArray source_rect1 = component.getJSONArray("thumb");
@@ -122,6 +125,62 @@ public class UI {
                     Drawable thumbDrawable = new BitmapDrawable(mainActivity.getResources(), scaledBitmap1);
 
                     seekBar.setThumb(thumbDrawable);
+                    x = source_rect.getInt(0);
+                    y = source_rect.getInt(1);
+                    width = source_rect.getInt(2) ;// - x;
+                    height = source_rect.getInt(3) ;//- y;
+                    int swidth = (int) (width * mainActivity.skin.scale);
+                    int sheight = (int) (height * mainActivity.skin.scale);
+                    HashMap <Integer, Bitmap> states = new HashMap<>();
+                    for (int i = 0 ; i < 28 ; i ++) {
+                        int y_ = y + (height * i);
+                        if (i > 0)
+                            y_ = y_ + i  ;
+
+                        Log.d(TAG, String.format ("[%s]: %d, %d %d %d %d", component.get("source"), i, x, y_, width, height));
+                        if (y_ < 0) y_ = 0;
+                        Bitmap bg = Bitmap.createBitmap(bitmap, x, y_, width, height, null, true);
+                        Bitmap bgs = Bitmap.createScaledBitmap(bg, (int) (swidth), (int)(sheight), true);
+                        states.put(i, bgs);
+                    }
+
+                    Log.d(TAG, String.format ("put %s: %d", component.getString("source"), states.size()));
+                    mainActivity.skin.states.put(component.getString("source"), states);
+                    seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+                        final String name = component.getString("source");
+
+                        @Override
+                        public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+//                            Log.d(TAG, "All component names with states:");
+//                            for (String componentNameKey : mainActivity.skin.states.keySet()) {
+//                                Log.d(TAG, "Component Key: " + componentNameKey);
+//                            }
+
+                            int key = (int) ((i/100.0f) * 27);
+                            Bitmap bit = null ;
+                            Log.d(TAG, String.format ("%s %d: %d", name, i, key));
+                            if (!mainActivity.skin.states.containsKey(name)) {
+                                Log.e(TAG, String.format("onProgressChanged: no %s in states!", name));
+                                return;
+                            }
+
+                            HashMap <Integer, Bitmap> state = mainActivity.skin.states.get(name);
+                            assert state != null;
+                            bit = state.get(key);
+                            seekBar.setBackground(new BitmapDrawable(bit));
+                            Log.i(TAG, "onProgressChanged: bitmap changed");
+                        }
+
+                        @Override
+                        public void onStartTrackingTouch(SeekBar seekBar) {
+
+                        }
+
+                        @Override
+                        public void onStopTrackingTouch(SeekBar seekBar) {
+
+                        }
+                    });
                 }
             }
         }

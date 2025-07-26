@@ -125,19 +125,21 @@
 
     "volume": {
       "name": "Volume Bar",
-      "coordinates": [107, 57, 68, 13],
+      "coordinates": [107, 57, 68, 14],
       "source": "volume.bmp",
       "type": "seekbar",
-      "source_rect": [0, 0, 68, 13],
+      "bg": true,
+      "source_rect": [0, 0, 68, 14],
       "thumb": [15, 422, 14, 11]
     },
 
     "balance": {
       "name": "Balance Bar",
-      "coordinates": [169, 57, 68, 13],
+      "coordinates": [169, 57, 65, 14],
+      "bg": true,
       "source": "balance.bmp",
       "type": "seekbar",
-      "source_rect": [0, 0, 68, 13],
+      "source_rect": [0, 0, 68, 14],
       "thumb": [15, 422, 14, 11]
     },
     "posbar": {
