@@ -90,6 +90,65 @@
       "source_rect": [114, 0, 22, 16]
     },
 
+    "shuffle": {
+      "name": "Shuffle Button",
+      "coordinates": [164, 89, 46, 15],
+      "source": "shufrep.bmp",
+      "type": "toggle",
+      "source_rect": [28, 0, 46, 15],
+      "source_rect_on": [28, 30, 46, 15]
+    },
+    "repeat": {
+      "name": "Repeat Button",
+      "coordinates": [210, 89, 28, 15],
+      "source": "shufrep.bmp",
+      "type": "toggle",
+      "source_rect": [0, 0, 28, 15],
+      "source_rect_on": [0, 15, 28, 15]
+    },
+
+    "mono": {
+      "name": "Mono Stereo",
+      "coordinates": [212, 44, 27, 12],
+      "source": "monoster.bmp",
+      "type": "image",
+      "source_rect": [29, 12, 27, 12]
+    },
+
+    "ster": {
+      "name": "Stereo",
+      "coordinates": [240, 44, 27, 12],
+      "source": "monoster.bmp",
+      "type": "image",
+      "source_rect": [0, 0, 29, 12]
+    },
+
+    "volume": {
+      "name": "Volume Bar",
+      "coordinates": [107, 57, 68, 13],
+      "source": "volume.bmp",
+      "type": "seekbar",
+      "source_rect": [0, 0, 68, 13],
+      "thumb": [15, 422, 14, 11]
+    },
+
+    "balance": {
+      "name": "Balance Bar",
+      "coordinates": [169, 57, 68, 13],
+      "source": "balance.bmp",
+      "type": "seekbar",
+      "source_rect": [0, 0, 68, 13],
+      "thumb": [15, 422, 14, 11]
+    },
+    "posbar": {
+      "name": "Seek Bar",
+      "coordinates": [20, 70, 249, 10],
+      "source": "posbar.bmp",
+      "type": "seekbar",
+      "source_rect": [0, 0, 249, 10],
+      "thumb": [249, 0, 28, 10]
+
+    },
     "control_buttons": [
       {
         "name": "Minimize",

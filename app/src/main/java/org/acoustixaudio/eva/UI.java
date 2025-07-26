@@ -10,6 +10,7 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.util.Log;
 import android.view.View;
@@ -96,9 +97,32 @@ public class UI {
                 int width = source_rect.getInt(2) ;// - x;
                 int height = source_rect.getInt(3) ;//- y;
                 Bitmap croppedBitmap = Bitmap.createBitmap(bitmap, x, y, width, height, null, true);
-                Bitmap scaledBitmap = Bitmap.createScaledBitmap(croppedBitmap, (int) (croppedBitmap.getWidth() * mainActivity.skin.scale), (int)(croppedBitmap.getHeight() * mainActivity.skin.scale), true);
-                Log.d(TAG, String.format ("[bitmap size]: %d x %d", scaledBitmap.getWidth(), scaledBitmap.getHeight()));
+                width = (int) (width * mainActivity.skin.scale);
+                height = (int) (height * mainActivity.skin.scale);
+
+                Bitmap scaledBitmap = Bitmap.createScaledBitmap(croppedBitmap, (int) (width), (int)(height), true);
+                Log.d(TAG, String.format ("[bitmap size]: %d x %d", width, height));
                 view.setBackground(new android.graphics.drawable.BitmapDrawable(mainActivity.getResources(), scaledBitmap));
+
+                if (component.getString("type").equals("seekbar")) {
+                    assert view instanceof SeekBar;
+                    SeekBar seekBar = (SeekBar) view;
+                    JSONArray source_rect1 = component.getJSONArray("thumb");
+                    int x1 = source_rect1.getInt(0);
+                    int y1 = source_rect1.getInt(1);
+                    int width1 = source_rect1.getInt(2) ;// - x;
+                    int height1 = source_rect1.getInt(3) ;//- y;
+
+                    Log.d(TAG, String.format ("[thumb] %d x %d: %d x %d", x1, y1, width1, height1));
+                    Bitmap croppedBitmap1 = Bitmap.createBitmap(bitmap, x1, y1, width1, height1, null, true);
+                    width1 = (int) (croppedBitmap1.getWidth() * mainActivity.skin.scale);
+                    height1 = (int) (croppedBitmap1.getHeight() * mainActivity.skin.scale);
+                    Log.d(TAG, String.format ("[thumb size]: %d x %d", width1, height1));
+                    Bitmap scaledBitmap1 = Bitmap.createScaledBitmap(croppedBitmap1, width1, height1, true);
+                    Drawable thumbDrawable = new BitmapDrawable(mainActivity.getResources(), scaledBitmap1);
+
+                    seekBar.setThumb(thumbDrawable);
+                }
             }
         }
 
@@ -130,5 +154,23 @@ public class UI {
         mainActivity.root.addView(next);
         Button eject = (Button) createView(skinFormat.getJSONObject("main_window").getJSONObject("eject"));
         mainActivity.root.addView(eject);
+
+        ImageView mono = (ImageView) createView(skinFormat.getJSONObject("main_window").getJSONObject("mono"));
+        mainActivity.root.addView(mono);
+
+        ImageView stereo = (ImageView) createView(skinFormat.getJSONObject("main_window").getJSONObject("ster"));
+        mainActivity.root.addView(stereo);
+
+        ToggleButton shuffle = (ToggleButton) createView(skinFormat.getJSONObject("main_window").getJSONObject("shuffle"));
+        mainActivity.root.addView(shuffle);
+        ToggleButton repeat = (ToggleButton) createView(skinFormat.getJSONObject("main_window").getJSONObject("repeat"));
+        mainActivity.root.addView(repeat);
+
+        SeekBar volume = (SeekBar) createView(skinFormat.getJSONObject("main_window").getJSONObject("volume"));
+        mainActivity.root.addView(volume);
+        SeekBar balance = (SeekBar) createView(skinFormat.getJSONObject("main_window").getJSONObject("balance"));
+        mainActivity.root.addView(balance);
+        SeekBar posbar = (SeekBar) createView(skinFormat.getJSONObject("main_window").getJSONObject("posbar"));
+        mainActivity.root.addView(posbar);
     }
 }
