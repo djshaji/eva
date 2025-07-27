@@ -32,7 +32,7 @@ public class UI {
     public static final String TAG = "UI";
 
     MainActivity mainActivity ;
-    ImageView mainWindow = null ;
+    ImageView mainWindow = null, equalizer ;
     Button prev, play, pause, next, stop, eject ;
     ToggleButton shuffle, repeat, toggle_playlist, toggle_eq ;
     SeekBar seekBar, volume, balance ;
@@ -170,9 +170,9 @@ public class UI {
                         }
 
                         Log.d(TAG, String.format("put %s: %d", component.getString("source"), states.size()));
-                        mainActivity.skin.states.put(component.getString("source"), states);
+                        mainActivity.skin.states.put(component.getString("name"), states);
                         seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-                            final String name = component.getString("source");
+                            final String name = component.getString("name");
 
                             @Override
                             public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
@@ -257,6 +257,21 @@ public class UI {
         mainActivity.root.addView(balance);
         SeekBar posbar = (SeekBar) createView(skinFormat.getJSONObject("main_window").getJSONObject("posbar"));
         mainActivity.root.addView(posbar);
+
+        equalizer = (ImageView) createView(skinFormat.getJSONObject("equalizer_window").getJSONObject("background"));
+        mainActivity.root.addView(equalizer);
+
+        ImageView titleBar_eq = (ImageView) createView(skinFormat.getJSONObject("equalizer_window").getJSONObject("title_bar"));
+        mainActivity.root.addView(titleBar_eq);
+
+        JSONArray eq_sliders = skinFormat.getJSONObject("equalizer_window").getJSONArray("sliders");
+        for (int i = 0; i < eq_sliders.length(); i++) {
+            JSONObject slider = eq_sliders.getJSONObject(i);
+            Log.d(TAG, "create: " + slider);
+            SeekBar seekBar = (SeekBar) createView(slider);
+            mainActivity.root.addView(seekBar);
+            break;
+        }
     }
 
     Bitmap getCroppedScaledBitmap (Bitmap bitmap, JSONArray source_rect) throws JSONException {

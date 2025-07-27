@@ -289,35 +289,32 @@
 
   "equalizer_window": {
     "background": {
-      "coordinates": [0, 0, 275, 116],
+      "coordinates": [0, 116, 275, 116],
       "source": "eqmain.bmp",
+      "type": "image",
       "source_rect": [0, 0, 275, 116],
       "notes": "Equalizer main background"
     },
     "title_bar": {
-      "coordinates": [0, 0, 275, 14],
+      "coordinates": [0, 116, 275, 14],
       "source": "eqmain.bmp",
-      "source_rect": [0, 0, 275, 14],
+      "source_rect": [0, 134, 275, 14],
+      "type": "image",
       "notes": "Equalizer window title bar"
     },
     "slider_thumb": {
       "source": "eqmain.bmp",
-      "source_rect": [0, 229, 15, 13],
       "notes": "Shared slider thumb image for all EQ sliders"
     },
     "sliders": [
       {
-        "name": "Preamp",
-        "coordinates": [20, 32, 15, 60],
-        "source": "eqmain.bmp",
-        "source_rect": [13, 164, 15, 60],
-        "slider_thumb_ref": "slider_thumb"
-      },
-      {
         "name": "60Hz",
-        "coordinates": [40, 32, 15, 60],
+        "coordinates": [23, 153, 14, 64],
         "source": "eqmain.bmp",
-        "source_rect": [28, 164, 15, 60],
+        "vertical": true,
+        "type": "seekbar",
+        "source_rect": [13, 164, 14, 64],
+        "thumb": [0, 164, 11, 12],
         "slider_thumb_ref": "slider_thumb"
       },
       {
