@@ -5,6 +5,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import java.io.IOException;
 import java.io.InputStream;
+
+import androidx.annotation.NonNull;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
 import android.graphics.Bitmap;
@@ -16,6 +18,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.AbsoluteLayout;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.GridLayout;
 import android.widget.ImageView;
 import android.widget.SeekBar;
@@ -50,6 +53,8 @@ public class UI {
                 break ;
             case "seekbar":
                 view = new SeekBar(mainActivity) ;
+                ((SeekBar) view).setSplitTrack(false);
+                ((SeekBar) view).setProgressDrawable(null);
                 break ;
             case "toggle":
                 view = new ToggleButton(mainActivity) ;
@@ -107,80 +112,101 @@ public class UI {
                 Log.d(TAG, String.format ("[bitmap size]: %d x %d", width, height));
                 view.setBackground(new android.graphics.drawable.BitmapDrawable(mainActivity.getResources(), scaledBitmap));
 
-                if (component.has("bg") && component.getBoolean("bg")) {
-                    assert view instanceof SeekBar;
+                if (view instanceof ToggleButton) {
+                    HashMap <Integer, Bitmap> states = new HashMap<>();
+                    states.put(1, scaledBitmap);
+                    Bitmap toggled = getCroppedScaledBitmap(bitmap, component.getJSONArray("source_rect_on"));
+                    states.put(0, toggled);
+                    mainActivity.skin.states.put(component.getString("name"), states);
+                    ToggleButton toggleButton = (ToggleButton) view;
+                    toggleButton.setOnCheckedChangeListener(new ToggleButton.OnCheckedChangeListener() {
+                        final String name = component.getString("name") ;
+                        @Override
+                        public void onCheckedChanged(@NonNull CompoundButton compoundButton, boolean b) {
+                            if (b) {
+                                compoundButton.setBackground(new BitmapDrawable(mainActivity.getResources(), mainActivity.skin.states.get(name).get(1)));
+                            } else {
+                                compoundButton.setBackground(new BitmapDrawable(mainActivity.getResources(), mainActivity.skin.states.get(name).get(0)));
+                            }
+                        }
+                    });
+                }
+
+                if (view instanceof SeekBar) {
                     SeekBar seekBar = (SeekBar) view;
                     JSONArray source_rect1 = component.getJSONArray("thumb");
                     int x1 = source_rect1.getInt(0);
                     int y1 = source_rect1.getInt(1);
-                    int width1 = source_rect1.getInt(2) ;// - x;
-                    int height1 = source_rect1.getInt(3) ;//- y;
+                    int width1 = source_rect1.getInt(2);// - x;
+                    int height1 = source_rect1.getInt(3);//- y;
 
-                    Log.d(TAG, String.format ("[thumb] %d x %d: %d x %d", x1, y1, width1, height1));
+                    Log.d(TAG, String.format("[thumb] %d x %d: %d x %d", x1, y1, width1, height1));
                     Bitmap croppedBitmap1 = Bitmap.createBitmap(bitmap, x1, y1, width1, height1, null, true);
                     width1 = (int) (croppedBitmap1.getWidth() * mainActivity.skin.scale);
                     height1 = (int) (croppedBitmap1.getHeight() * mainActivity.skin.scale);
-                    Log.d(TAG, String.format ("[thumb size]: %d x %d", width1, height1));
+                    Log.d(TAG, String.format("[thumb size]: %d x %d", width1, height1));
                     Bitmap scaledBitmap1 = Bitmap.createScaledBitmap(croppedBitmap1, width1, height1, true);
                     Drawable thumbDrawable = new BitmapDrawable(mainActivity.getResources(), scaledBitmap1);
 
                     seekBar.setThumb(thumbDrawable);
-                    x = source_rect.getInt(0);
-                    y = source_rect.getInt(1);
-                    width = source_rect.getInt(2) ;// - x;
-                    height = source_rect.getInt(3) ;//- y;
-                    int swidth = (int) (width * mainActivity.skin.scale);
-                    int sheight = (int) (height * mainActivity.skin.scale);
-                    HashMap <Integer, Bitmap> states = new HashMap<>();
-                    for (int i = 0 ; i < 28 ; i ++) {
-                        int y_ = y + (height * i);
-                        if (i > 0)
-                            y_ = y_ + i  ;
+                    if (component.has("bg") && component.getBoolean("bg")) {
+                        x = source_rect.getInt(0);
+                        y = source_rect.getInt(1);
+                        width = source_rect.getInt(2);// - x;
+                        height = source_rect.getInt(3);//- y;
+                        int swidth = (int) (width * mainActivity.skin.scale);
+                        int sheight = (int) (height * mainActivity.skin.scale);
+                        HashMap<Integer, Bitmap> states = new HashMap<>();
+                        for (int i = 0; i < 28; i++) {
+                            int y_ = y + (height * i);
+                            if (i > 0)
+                                y_ = y_ + i;
 
-                        Log.d(TAG, String.format ("[%s]: %d, %d %d %d %d", component.get("source"), i, x, y_, width, height));
-                        if (y_ < 0) y_ = 0;
-                        Bitmap bg = Bitmap.createBitmap(bitmap, x, y_, width, height, null, true);
-                        Bitmap bgs = Bitmap.createScaledBitmap(bg, (int) (swidth), (int)(sheight), true);
-                        states.put(i, bgs);
-                    }
+//                            Log.d(TAG, String.format("[%s]: %d, %d %d %d %d", component.get("source"), i, x, y_, width, height));
+                            if (y_ < 0) y_ = 0;
+                            Bitmap bg = Bitmap.createBitmap(bitmap, x, y_, width, height, null, true);
+                            Bitmap bgs = Bitmap.createScaledBitmap(bg, (int) (swidth), (int) (sheight), true);
+                            states.put(i, bgs);
+                        }
 
-                    Log.d(TAG, String.format ("put %s: %d", component.getString("source"), states.size()));
-                    mainActivity.skin.states.put(component.getString("source"), states);
-                    seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-                        final String name = component.getString("source");
+                        Log.d(TAG, String.format("put %s: %d", component.getString("source"), states.size()));
+                        mainActivity.skin.states.put(component.getString("source"), states);
+                        seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+                            final String name = component.getString("source");
 
-                        @Override
-                        public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+                            @Override
+                            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
 //                            Log.d(TAG, "All component names with states:");
 //                            for (String componentNameKey : mainActivity.skin.states.keySet()) {
 //                                Log.d(TAG, "Component Key: " + componentNameKey);
 //                            }
 
-                            int key = (int) ((i/100.0f) * 27);
-                            Bitmap bit = null ;
-                            Log.d(TAG, String.format ("%s %d: %d", name, i, key));
-                            if (!mainActivity.skin.states.containsKey(name)) {
-                                Log.e(TAG, String.format("onProgressChanged: no %s in states!", name));
-                                return;
+                                int key = (int) ((i / 100.0f) * 27);
+                                Bitmap bit = null;
+                                Log.d(TAG, String.format("%s %d: %d", name, i, key));
+                                if (!mainActivity.skin.states.containsKey(name)) {
+                                    Log.e(TAG, String.format("onProgressChanged: no %s in states!", name));
+                                    return;
+                                }
+
+                                HashMap<Integer, Bitmap> state = mainActivity.skin.states.get(name);
+                                assert state != null;
+                                bit = state.get(key);
+                                seekBar.setBackground(new BitmapDrawable(bit));
+                                Log.i(TAG, "onProgressChanged: bitmap changed");
                             }
 
-                            HashMap <Integer, Bitmap> state = mainActivity.skin.states.get(name);
-                            assert state != null;
-                            bit = state.get(key);
-                            seekBar.setBackground(new BitmapDrawable(bit));
-                            Log.i(TAG, "onProgressChanged: bitmap changed");
-                        }
+                            @Override
+                            public void onStartTrackingTouch(SeekBar seekBar) {
 
-                        @Override
-                        public void onStartTrackingTouch(SeekBar seekBar) {
+                            }
 
-                        }
+                            @Override
+                            public void onStopTrackingTouch(SeekBar seekBar) {
 
-                        @Override
-                        public void onStopTrackingTouch(SeekBar seekBar) {
-
-                        }
-                    });
+                            }
+                        });
+                    }
                 }
             }
         }
@@ -231,5 +257,18 @@ public class UI {
         mainActivity.root.addView(balance);
         SeekBar posbar = (SeekBar) createView(skinFormat.getJSONObject("main_window").getJSONObject("posbar"));
         mainActivity.root.addView(posbar);
+    }
+
+    Bitmap getCroppedScaledBitmap (Bitmap bitmap, JSONArray source_rect) throws JSONException {
+        int x = source_rect.getInt(0);
+        int y = source_rect.getInt(1);
+        int width = source_rect.getInt(2) ;// - x;
+        int height = source_rect.getInt(3) ;//- y;
+        Bitmap croppedBitmap = Bitmap.createBitmap(bitmap, x, y, width, height, null, true);
+        width = (int) (width * mainActivity.skin.scale);
+        height = (int) (height * mainActivity.skin.scale);
+
+        Bitmap scaledBitmap = Bitmap.createScaledBitmap(croppedBitmap, (int) (width), (int)(height), true);
+        return scaledBitmap;
     }
 }

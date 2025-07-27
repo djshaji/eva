@@ -34,7 +34,7 @@
       "source": "shufrep.bmp",
       "type": "toggle",
       "source_rect": [0, 61, 23, 12],
-      "source_rect_toggle_on": [0, 73, 23, 12]
+      "source_rect_on": [0, 73, 23, 12]
     },
 
     "pl_button": {
@@ -43,7 +43,7 @@
       "source": "shufrep.bmp",
       "type": "toggle",
       "source_rect": [23, 61, 23, 12],
-      "source_rect_toggle_on": [23, 73, 23, 12]
+      "source_rect_on": [23, 73, 23, 12]
     },
 
     "prev": {
@@ -104,7 +104,7 @@
       "source": "shufrep.bmp",
       "type": "toggle",
       "source_rect": [0, 0, 28, 15],
-      "source_rect_on": [0, 15, 28, 15]
+      "source_rect_on": [0, 30, 28, 15]
     },
 
     "mono": {
