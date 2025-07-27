@@ -22,6 +22,7 @@ import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.GridLayout;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.SeekBar;
 import android.widget.ToggleButton;
 
@@ -59,7 +60,7 @@ public class UI {
                 ((SeekBar) view).setSplitTrack(false);
                 ((SeekBar) view).setProgressDrawable(null);
                 if (component.has("vertical") && component.getBoolean("vertical")) {
-//                    ((SeekBar) view).setRotation(270);
+                    ((SeekBar) view).setRotation(270);
                     rotated = true;
                 }
 
@@ -82,6 +83,12 @@ public class UI {
 
             width = (int) (width * mainActivity.skin.scale) ;
             height = (int) (height * mainActivity.skin.scale) ;
+
+            if (rotated) {
+                int tmp = width ;
+                width = height;
+                height = tmp;
+            }
 
             int marginLeft = coordinates.getInt(0);
             marginLeft = (int) (marginLeft * mainActivity.skin.scale) ;
@@ -109,6 +116,11 @@ public class UI {
             if (component.has("source_rect")) {
                 JSONArray source_rect = component.getJSONArray("source_rect");
                 Bitmap scaledBitmap = getCroppedScaledBitmap(bitmap, source_rect);
+                if (rotated) {
+                    Matrix matrix = new Matrix();
+                    matrix.postRotate(90);
+                    scaledBitmap = Bitmap.createBitmap(scaledBitmap, 0, 0, scaledBitmap.getWidth(), scaledBitmap.getHeight(), matrix, true);
+                }
                 view.setBackground(new android.graphics.drawable.BitmapDrawable(mainActivity.getResources(), scaledBitmap));
 
                 if (view instanceof ToggleButton) {
@@ -147,7 +159,16 @@ public class UI {
                     Bitmap scaledBitmap1 = Bitmap.createScaledBitmap(croppedBitmap1, width1, height1, true);
                     Drawable thumbDrawable = new BitmapDrawable(mainActivity.getResources(), scaledBitmap1);
 
-                    seekBar.setThumb(thumbDrawable);
+                    if (! rotated)
+                        seekBar.setThumb(thumbDrawable);
+                    else {
+                        Matrix matrix = new Matrix();
+                        matrix.postRotate(270);
+                        scaledBitmap1 = Bitmap.createBitmap(scaledBitmap1, 0, 0, scaledBitmap1.getWidth(), scaledBitmap1.getHeight(), matrix, true);
+                        thumbDrawable = new BitmapDrawable(mainActivity.getResources(), scaledBitmap1);
+                        seekBar.setThumb(thumbDrawable);
+                    }
+
                     if (component.has("bg") && component.getBoolean("bg")) {
                         int x = source_rect.getInt(0);
                         int y = source_rect.getInt(1);
@@ -209,8 +230,8 @@ public class UI {
                 }
 
             }
-        }
 
+        }
 
         return view ;
     }
@@ -267,11 +288,14 @@ public class UI {
 
         JSONArray eq_sliders = skinFormat.getJSONObject("equalizer_window").getJSONArray("sliders");
         for (int i = 0; i < eq_sliders.length(); i++) {
+            if (i == 11)
+                break ;
             JSONObject slider = eq_sliders.getJSONObject(i);
-            Log.d(TAG, "create: " + slider);
-            SeekBar seekBar = (SeekBar) createView(slider);
+            Log.d(TAG, String.valueOf(i) + " create: " + slider);
+            View seekBar = createView(slider);
+            ((SeekBar) seekBar).setMax(100);
+            ((SeekBar) seekBar).setMin(-100);
             mainActivity.root.addView(seekBar);
-            break;
         }
     }
 
