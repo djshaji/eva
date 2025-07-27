@@ -12,6 +12,7 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.graphics.Matrix;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.util.Log;
@@ -46,7 +47,9 @@ public class UI {
 
     public View createView (JSONObject component) throws JSONException {
         View view = null ;
+        ConstraintLayout.LayoutParams params = null ;
         Log.i(TAG, "createView: " + component);
+        boolean rotated = false ;
         switch (component.getString("type")) {
             case "button":
                 view = new Button(mainActivity) ;
@@ -55,6 +58,11 @@ public class UI {
                 view = new SeekBar(mainActivity) ;
                 ((SeekBar) view).setSplitTrack(false);
                 ((SeekBar) view).setProgressDrawable(null);
+                if (component.has("vertical") && component.getBoolean("vertical")) {
+//                    ((SeekBar) view).setRotation(270);
+                    rotated = true;
+                }
+
                 break ;
             case "toggle":
                 view = new ToggleButton(mainActivity) ;
@@ -81,7 +89,7 @@ public class UI {
             marginTop = (int) (marginTop * mainActivity.skin.scale) ;
 
             Log.i(TAG, String.format ("[view size]: %d x %d [%d %d]", width, height, marginLeft, marginTop));
-            ConstraintLayout.LayoutParams params = new ConstraintLayout.LayoutParams(width, height);
+            params = new ConstraintLayout.LayoutParams(width, height);
             params.setMargins(marginLeft, marginTop, 0, 0);
             params.topToTop = ConstraintLayout.LayoutParams.PARENT_ID;
             params.startToStart = ConstraintLayout.LayoutParams.PARENT_ID;
@@ -100,16 +108,7 @@ public class UI {
             Bitmap bitmap = mainActivity.skin.skin.get(component.getString("source")).getBitmap();
             if (component.has("source_rect")) {
                 JSONArray source_rect = component.getJSONArray("source_rect");
-                int x = source_rect.getInt(0);
-                int y = source_rect.getInt(1);
-                int width = source_rect.getInt(2) ;// - x;
-                int height = source_rect.getInt(3) ;//- y;
-                Bitmap croppedBitmap = Bitmap.createBitmap(bitmap, x, y, width, height, null, true);
-                width = (int) (width * mainActivity.skin.scale);
-                height = (int) (height * mainActivity.skin.scale);
-
-                Bitmap scaledBitmap = Bitmap.createScaledBitmap(croppedBitmap, (int) (width), (int)(height), true);
-                Log.d(TAG, String.format ("[bitmap size]: %d x %d", width, height));
+                Bitmap scaledBitmap = getCroppedScaledBitmap(bitmap, source_rect);
                 view.setBackground(new android.graphics.drawable.BitmapDrawable(mainActivity.getResources(), scaledBitmap));
 
                 if (view instanceof ToggleButton) {
@@ -150,10 +149,10 @@ public class UI {
 
                     seekBar.setThumb(thumbDrawable);
                     if (component.has("bg") && component.getBoolean("bg")) {
-                        x = source_rect.getInt(0);
-                        y = source_rect.getInt(1);
-                        width = source_rect.getInt(2);// - x;
-                        height = source_rect.getInt(3);//- y;
+                        int x = source_rect.getInt(0);
+                        int y = source_rect.getInt(1);
+                        int width = source_rect.getInt(2);// - x;
+                        int height = source_rect.getInt(3);//- y;
                         int swidth = (int) (width * mainActivity.skin.scale);
                         int sheight = (int) (height * mainActivity.skin.scale);
                         HashMap<Integer, Bitmap> states = new HashMap<>();
@@ -208,8 +207,10 @@ public class UI {
                         });
                     }
                 }
+
             }
         }
+
 
         return view ;
     }
