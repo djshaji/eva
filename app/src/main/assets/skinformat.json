@@ -309,7 +309,7 @@
     "sliders": [
       {
         "name": "preamp",
-        "coordinates": [0, 176, 14, 64],
+        "coordinates": [-4, 176, 14, 64],
         "source": "eqmain.bmp",
         "vertical": true,
         "type": "seekbar",
@@ -419,21 +419,26 @@
       }
     ],
     "on_off_button": {
-      "coordinates": [20, 10, 25, 12],
-      "source": "eq_ex.bmp",
-      "source_rect": [0, 0, 25, 12],
-      "notes": "EQ ON/OFF button"
+      "coordinates": [16, 134, 25, 12],
+      "source": "eqmain.bmp",
+      "type": "toggle",
+      "source_rect": [10, 119, 25, 12],
+      "source_rect_on": [69, 119, 25, 12],
+      "name": "EQ ON/OFF button"
     },
     "auto_button": {
-      "coordinates": [50, 10, 25, 12],
-      "source": "eq_ex.bmp",
-      "source_rect": [25, 0, 25, 12],
-      "notes": "EQ AUTO button"
+      "coordinates": [42, 134, 32, 12],
+      "source": "eqmain.bmp",
+      "source_rect": [36, 119, 32, 12],
+      "source_rect_on": [95, 119, 32, 12],
+      "type": "toggle",
+      "name": "EQ AUTO button"
     },
     "presets_button": {
-      "coordinates": [80, 10, 25, 12],
-      "source": "eq_ex.bmp",
-      "source_rect": [50, 0, 25, 12],
+      "coordinates": [217, 134, 44, 12],
+      "source": "eqmain.bmp",
+      "type": "button",
+      "source_rect": [224, 164, 44, 12],
       "notes": "EQ Presets button"
     }
   },

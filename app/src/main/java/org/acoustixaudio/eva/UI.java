@@ -297,6 +297,13 @@ public class UI {
             ((SeekBar) seekBar).setMin(-100);
             mainActivity.root.addView(seekBar);
         }
+
+        toggle_eq = (ToggleButton) createView(skinFormat.getJSONObject("equalizer_window").getJSONObject("on_off_button"));
+        mainActivity.root.addView(toggle_eq);
+        ToggleButton auto_eq = (ToggleButton) createView(skinFormat.getJSONObject("equalizer_window").getJSONObject("auto_button"));
+        mainActivity.root.addView(auto_eq);
+        Button presets = (Button) createView(skinFormat.getJSONObject("equalizer_window").getJSONObject("presets_button"));
+        mainActivity.root.addView(presets);
     }
 
     Bitmap getCroppedScaledBitmap (Bitmap bitmap, JSONArray source_rect) throws JSONException {
