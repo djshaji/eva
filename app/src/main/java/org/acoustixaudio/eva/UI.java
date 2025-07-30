@@ -304,6 +304,61 @@ public class UI {
         mainActivity.root.addView(auto_eq);
         Button presets = (Button) createView(skinFormat.getJSONObject("equalizer_window").getJSONObject("presets_button"));
         mainActivity.root.addView(presets);
+
+        int width = 0 ;
+        int counter = 1 ;
+        while (width < 275) {
+            Log.i(TAG, "create: adding playlist title bar " + counter ++);
+            JSONObject j = skinFormat.getJSONObject("playlist").getJSONObject("titlebar").getJSONObject("repeat");
+            j.put("coordinates", new JSONArray(new int[]{width, 232, 25, 20}));
+            ImageView pl_item = (ImageView) createView(j);
+            mainActivity.root.addView(pl_item);
+            width += 23 ;
+        }
+
+        int statusBar = (int) ((int) Utils.getStatusBarHeight(mainActivity.getResources()) / mainActivity.skin.scale) + 20; // for some reason bottom of playlist is cut off
+        JSONObject bleft = skinFormat.getJSONObject("playlist").getJSONObject("titlebar").getJSONObject("bleft");
+
+        int height = (int) (mainActivity.skin.metrics.heightPixels / mainActivity.skin.scale) - statusBar - 38;
+        int right = (int) (mainActivity.skin.metrics.widthPixels / mainActivity.skin.scale) - 25;
+        for (int i = 232 ; i < height ; i++) {
+            JSONObject sl = skinFormat.getJSONObject("playlist").getJSONObject("titlebar").getJSONObject("sleft");
+            sl.put("coordinates", new JSONArray(new int[]{0, i, 25, 29}));
+            ImageView pl_sleft = (ImageView) createView(sl);
+            mainActivity.root.addView(pl_sleft);
+            JSONObject sl2 = skinFormat.getJSONObject("playlist").getJSONObject("titlebar").getJSONObject("sright");
+            sl2.put("coordinates", new JSONArray(new int[]{right, i, 25, 29}));
+            ImageView pl_sleft2 = (ImageView) createView(sl2);
+            mainActivity.root.addView(pl_sleft2);
+
+        }
+
+        ImageView pl_left = (ImageView) createView(skinFormat.getJSONObject("playlist").getJSONObject("titlebar").getJSONObject("left"));
+        mainActivity.root.addView(pl_left);
+        ImageView pl_right = (ImageView) createView(skinFormat.getJSONObject("playlist").getJSONObject("titlebar").getJSONObject("right"));
+        mainActivity.root.addView(pl_right);
+
+        ImageView pl_title = (ImageView) createView(skinFormat.getJSONObject("playlist").getJSONObject("titlebar").getJSONObject("title"));
+        mainActivity.root.addView(pl_title);
+
+        int bly = bleft.getJSONArray("coordinates").getInt(3);
+        bly = (int)(mainActivity.skin.metrics.heightPixels / mainActivity.skin.scale) - bly - statusBar;
+        Log.i(TAG, "create: bottom left " + bly);
+        bleft.put("coordinates", new JSONArray(new int[]{0, bly, 125, 38}));
+
+        JSONObject blr = skinFormat.getJSONObject("playlist").getJSONObject("titlebar").getJSONObject("bright");
+        blr.put("coordinates", new JSONArray(
+                new int[]{
+                        (int)(mainActivity.skin.metrics.widthPixels / mainActivity.skin.scale) - 150,
+                        (int)(mainActivity.skin.metrics.heightPixels / mainActivity.skin.scale) - statusBar - 38,
+                        150, 38
+                }));
+
+        ImageView pl_bleft = (ImageView) createView(bleft);
+        mainActivity.root.addView(pl_bleft);
+        ImageView pl_bright = (ImageView) createView(blr);
+        mainActivity.root.addView(pl_bright);
+
     }
 
     Bitmap getCroppedScaledBitmap (Bitmap bitmap, JSONArray source_rect) throws JSONException {

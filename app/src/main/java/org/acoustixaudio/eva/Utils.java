@@ -1,5 +1,7 @@
 package org.acoustixaudio.eva;
 
+import android.content.res.Resources;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -32,4 +34,14 @@ public class Utils {
 
         return obj;
     }
+
+    public static int getStatusBarHeight(Resources resources) {
+        int result = 0;
+        int resourceId = resources.getIdentifier("status_bar_height", "dimen", "android");
+        if (resourceId > 0) {
+            result = resources.getDimensionPixelSize(resourceId);
+        }
+        return result;
+    }
+
 }

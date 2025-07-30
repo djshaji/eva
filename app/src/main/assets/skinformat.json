@@ -443,69 +443,66 @@
     }
   },
   
-  "playlist_window": {
-    "background": {
-      "coordinates": [0, 0, 275, 116],
-      "source": "pledit.bmp",
-      "pattern": {
-        "list_entry_tile": {
-          "source_rect": [0, 27, 232, 12],
-          "repeat": "vertical",
-          "notes": "This row is tiled vertically for the playlist entries area."
-        }
-      },
-      "notes": "Playlist main background with vertically repeating list entry tiles."
-    },
-    "title_bar": {
-      "coordinates": [0, 0, 232, 20],
-      "source": "pledit.bmp",
-      "source_rect": [0, 0, 232, 20],
-      "notes": "Playlist window title bar"
-    },
-    "buttons": [
-      {
-        "name": "Close",
-        "coordinates": [217, 4, 9, 9],
+  "playlist": {
+    "titlebar": {
+      "left": {
+        "name": "Title bar left",
+        "coordinates": [0, 232, 25, 20],
         "source": "pledit.bmp",
-        "source_rect": [232, 58, 9, 9]
+        "type": "image",
+        "source_rect": [0, 0, 25, 20]
       },
-      {
-        "name": "Shade",
-        "coordinates": [207, 4, 9, 9],
+      "right": {
+        "name": "Title bar right",
+        "coordinates": [250, 232, 25, 20],
         "source": "pledit.bmp",
-        "source_rect": [241, 58, 9, 9]
+        "type": "image",
+        "source_rect": [153, 0, 25, 20]
+      },
+      "repeat": {
+        "name": "Title bar repeat",
+        "coordinates": [0, 232, 25, 20],
+        "source": "pledit.bmp",
+        "type": "image",
+        "source_rect": [127, 0, 25, 20]
+
+      },
+      "title": {
+        "name": "Title bar",
+        "coordinates": [87, 232, 100, 20],
+        "source": "pledit.bmp",
+        "type": "image",
+        "source_rect": [26, 0, 100, 20]
+
+      },
+      "bleft": {
+        "name": "Title bar bl",
+        "coordinates": [0, 232, 125, 38],
+        "source": "pledit.bmp",
+        "type": "image",
+        "source_rect": [0, 72, 125, 38]
+      },
+      "bright": {
+        "name": "br",
+        "coordinates": [0, 232, 150, 38],
+        "source": "pledit.bmp",
+        "type": "image",
+        "source_rect": [126, 72, 150, 38]
+      },
+      "sleft": {
+        "name": "sleft",
+        "coordinates": [0, 232, 25, 29],
+        "source": "pledit.bmp",
+        "type": "image",
+        "source_rect": [0, 42, 25, 29]
+      },
+      "sright": {
+        "name": "sleft",
+        "coordinates": [0, 232, 25, 29],
+        "source": "pledit.bmp",
+        "type": "image",
+        "source_rect": [26, 42, 25, 29]
       }
-    ],
-    "scrollbar": {
-      "coordinates": [232, 20, 13, 68],
-      "source": "pledit.bmp",
-      "components": {
-        "up_arrow": {
-          "coordinates": [232, 20, 13, 13],
-          "source_rect": [232, 0, 13, 13]
-        },
-        "down_arrow": {
-          "coordinates": [232, 75, 13, 13],
-          "source_rect": [232, 13, 13, 13]
-        },
-        "slider": {
-          "coordinates": [232, 33, 13, 42],
-          "source_rect": [232, 26, 13, 42],
-          "notes": "Slider knob; moves vertically."
-        },
-        "track": {
-          "coordinates": [232, 20, 13, 68],
-          "source_rect": [245, 0, 13, 68],
-          "pattern": "vertical"
-        }
-      },
-      "notes": "Custom vertical scrollbar for playlist"
-    },
-    "list_area": {
-      "coordinates": [0, 20, 232, 68],
-      "pattern_tile_source_rect": [0, 27, 232, 12],
-      "repeat": "vertical",
-      "notes": "Playlist entries are drawn over this tiled area"
     }
   }
 }
