@@ -8,6 +8,7 @@ import java.io.InputStream;
 
 import androidx.annotation.NonNull;
 import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -39,6 +40,7 @@ public class UI {
     ToggleButton shuffle, repeat, toggle_playlist, toggle_eq ;
     SeekBar seekBar, volume, balance ;
     JSONObject skinFormat = null ;
+    RecyclerView recyclerView ;
 
 
     UI (MainActivity _mainActivity) {
@@ -236,6 +238,20 @@ public class UI {
         return view ;
     }
 
+
+    Bitmap getCroppedScaledBitmap (Bitmap bitmap, JSONArray source_rect) throws JSONException {
+        int x = source_rect.getInt(0);
+        int y = source_rect.getInt(1);
+        int width = source_rect.getInt(2) ;// - x;
+        int height = source_rect.getInt(3) ;//- y;
+        Bitmap croppedBitmap = Bitmap.createBitmap(bitmap, x, y, width, height, null, true);
+        width = (int) (width * mainActivity.skin.scale);
+        height = (int) (height * mainActivity.skin.scale);
+
+        Bitmap scaledBitmap = Bitmap.createScaledBitmap(croppedBitmap, (int) (width), (int)(height), true);
+        return scaledBitmap;
+    }
+
     public void create () throws JSONException {
         mainWindow = (ImageView) createView(skinFormat.getJSONObject("main_window").getJSONObject("background"));
         mainActivity.root.addView(mainWindow);
@@ -359,18 +375,21 @@ public class UI {
         ImageView pl_bright = (ImageView) createView(blr);
         mainActivity.root.addView(pl_bright);
 
-    }
+        recyclerView = new RecyclerView(mainActivity);
+        int rw = (int) (250 * mainActivity.skin.scale);
+        int rh = (int) (mainActivity.skin.metrics.heightPixels - ((statusBar + 116 + 38 + 140) * mainActivity.skin.scale));
+        int marginLeft = 12;
+        marginLeft = (int) (marginLeft * mainActivity.skin.scale) ;
+        int marginTop = 252;
+        marginTop = (int) (marginTop * mainActivity.skin.scale) ;
 
-    Bitmap getCroppedScaledBitmap (Bitmap bitmap, JSONArray source_rect) throws JSONException {
-        int x = source_rect.getInt(0);
-        int y = source_rect.getInt(1);
-        int width = source_rect.getInt(2) ;// - x;
-        int height = source_rect.getInt(3) ;//- y;
-        Bitmap croppedBitmap = Bitmap.createBitmap(bitmap, x, y, width, height, null, true);
-        width = (int) (width * mainActivity.skin.scale);
-        height = (int) (height * mainActivity.skin.scale);
+        ConstraintLayout.LayoutParams params = new ConstraintLayout.LayoutParams(rw, rh);
+        params.setMargins(marginLeft, marginTop, 0, 0);
+        params.topToTop = ConstraintLayout.LayoutParams.PARENT_ID;
+        params.startToStart = ConstraintLayout.LayoutParams.PARENT_ID;
+        recyclerView.setLayoutParams(params);
+        mainActivity.root.addView(recyclerView);
 
-        Bitmap scaledBitmap = Bitmap.createScaledBitmap(croppedBitmap, (int) (width), (int)(height), true);
-        return scaledBitmap;
+        recyclerView.setBackgroundColor(mainActivity.getResources().getColor(R.color.orchid));
     }
 }
