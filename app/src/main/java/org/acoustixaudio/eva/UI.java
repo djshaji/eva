@@ -51,7 +51,7 @@ public class UI {
     public View createView (JSONObject component) throws JSONException {
         View view = null ;
         ConstraintLayout.LayoutParams params = null ;
-        Log.i(TAG, "createView: " + component);
+//        Log.i(TAG, "createView: " + component);
         boolean rotated = false ;
         switch (component.getString("type")) {
             case "button":
@@ -97,7 +97,7 @@ public class UI {
             int marginTop = coordinates.getInt(1);
             marginTop = (int) (marginTop * mainActivity.skin.scale) ;
 
-            Log.i(TAG, String.format ("[view size]: %d x %d [%d %d]", width, height, marginLeft, marginTop));
+//            Log.i(TAG, String.format ("[view size]: %d x %d [%d %d]", width, height, marginLeft, marginTop));
             params = new ConstraintLayout.LayoutParams(width, height);
             params.setMargins(marginLeft, marginTop, 0, 0);
             params.topToTop = ConstraintLayout.LayoutParams.PARENT_ID;
@@ -105,7 +105,7 @@ public class UI {
             view.setLayoutParams(params);
             Random rnd = new Random();
             int color = Color.argb(255, rnd.nextInt(256), rnd.nextInt(256), rnd.nextInt(256));
-            Log.d(TAG, String.format("Color: #%06X", (0xFFFFFF & color)));
+//            Log.d(TAG, String.format("Color: #%06X", (0xFFFFFF & color)));
 
 //            view.setBackgroundColor(color);
             // Example of how to use a predefined color if needed later:
@@ -153,11 +153,11 @@ public class UI {
                     int width1 = source_rect1.getInt(2);// - x;
                     int height1 = source_rect1.getInt(3);//- y;
 
-                    Log.d(TAG, String.format("[thumb] %d x %d: %d x %d", x1, y1, width1, height1));
+//                    Log.d(TAG, String.format("[thumb] %d x %d: %d x %d", x1, y1, width1, height1));
                     Bitmap croppedBitmap1 = Bitmap.createBitmap(bitmap, x1, y1, width1, height1, null, true);
                     width1 = (int) (croppedBitmap1.getWidth() * mainActivity.skin.scale);
                     height1 = (int) (croppedBitmap1.getHeight() * mainActivity.skin.scale);
-                    Log.d(TAG, String.format("[thumb size]: %d x %d", width1, height1));
+//                    Log.d(TAG, String.format("[thumb size]: %d x %d", width1, height1));
                     Bitmap scaledBitmap1 = Bitmap.createScaledBitmap(croppedBitmap1, width1, height1, true);
                     Drawable thumbDrawable = new BitmapDrawable(mainActivity.getResources(), scaledBitmap1);
 
@@ -191,7 +191,7 @@ public class UI {
                             states.put(i, bgs);
                         }
 
-                        Log.d(TAG, String.format("put %s: %d", component.getString("source"), states.size()));
+//                        Log.d(TAG, String.format("put %s: %d", component.getString("source"), states.size()));
                         mainActivity.skin.states.put(component.getString("name"), states);
                         seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
                             final String name = component.getString("name");
@@ -205,7 +205,7 @@ public class UI {
 
                                 int key = (int) ((i / 100.0f) * 27);
                                 Bitmap bit = null;
-                                Log.d(TAG, String.format("%s %d: %d", name, i, key));
+//                                Log.d(TAG, String.format("%s %d: %d", name, i, key));
                                 if (!mainActivity.skin.states.containsKey(name)) {
                                     Log.e(TAG, String.format("onProgressChanged: no %s in states!", name));
                                     return;
@@ -215,7 +215,7 @@ public class UI {
                                 assert state != null;
                                 bit = state.get(key);
                                 seekBar.setBackground(new BitmapDrawable(bit));
-                                Log.i(TAG, "onProgressChanged: bitmap changed");
+//                                Log.i(TAG, "onProgressChanged: bitmap changed");
                             }
 
                             @Override
@@ -307,7 +307,7 @@ public class UI {
             if (i == 11)
                 break ;
             JSONObject slider = eq_sliders.getJSONObject(i);
-            Log.d(TAG, String.valueOf(i) + " create: " + slider);
+//            Log.d(TAG, String.valueOf(i) + " create: " + slider);
             View seekBar = createView(slider);
             ((SeekBar) seekBar).setMax(100);
             ((SeekBar) seekBar).setMin(-100);
@@ -324,7 +324,7 @@ public class UI {
         int width = 0 ;
         int counter = 1 ;
         while (width < 275) {
-            Log.i(TAG, "create: adding playlist title bar " + counter ++);
+//            Log.i(TAG, "create: adding playlist title bar " + counter ++);
             JSONObject j = skinFormat.getJSONObject("playlist").getJSONObject("titlebar").getJSONObject("repeat");
             j.put("coordinates", new JSONArray(new int[]{width, 232, 25, 20}));
             ImageView pl_item = (ImageView) createView(j);
@@ -359,7 +359,7 @@ public class UI {
 
         int bly = bleft.getJSONArray("coordinates").getInt(3);
         bly = (int)(mainActivity.skin.metrics.heightPixels / mainActivity.skin.scale) - bly - statusBar;
-        Log.i(TAG, "create: bottom left " + bly);
+//        Log.i(TAG, "create: bottom left " + bly);
         bleft.put("coordinates", new JSONArray(new int[]{0, bly, 125, 38}));
 
         JSONObject blr = skinFormat.getJSONObject("playlist").getJSONObject("titlebar").getJSONObject("bright");
@@ -390,6 +390,9 @@ public class UI {
         recyclerView.setLayoutParams(params);
         mainActivity.root.addView(recyclerView);
 
-        recyclerView.setBackgroundColor(mainActivity.getResources().getColor(R.color.orchid));
+        String plColor = ((JSONObject)(mainActivity.skin.inis.get("pledit.txt"))).getJSONObject ("Text").get ("NormalBG").toString();
+        int plColorInt = Color.parseColor(plColor);
+        recyclerView.setBackgroundColor(plColorInt);
+        Log.i(TAG, "plColor: " + plColor);
     }
 }

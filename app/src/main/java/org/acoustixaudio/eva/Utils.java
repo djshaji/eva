@@ -1,6 +1,7 @@
 package org.acoustixaudio.eva;
 
 import android.content.res.Resources;
+import android.util.Log;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -14,6 +15,7 @@ import java.util.regex.Pattern;
 
 public class Utils {
     MainActivity mainActivity ;
+    public static String TAG = "Utils" ;
     Utils (MainActivity _mainActivity) {
         mainActivity = _mainActivity;
     }
@@ -71,12 +73,14 @@ public class Utils {
                 currentSectionName = sectionMatcher.group(1);
                 currentSection = new JSONObject();
                 jsonObject.put(currentSectionName, currentSection);
+                Log.d(TAG, String.format ("%s: %s", currentSectionName, currentSection));
             } else {
                 Matcher keyValueMatcher = keyValuePattern.matcher(line);
                 if (keyValueMatcher.matches() && currentSection != null) {
                     String key = keyValueMatcher.group(1).trim();
                     String value = keyValueMatcher.group(2).trim();
                     currentSection.put(key, value);
+                    Log.d(TAG, String.format ("%s: %s", key, value));
                 }
             }
         }

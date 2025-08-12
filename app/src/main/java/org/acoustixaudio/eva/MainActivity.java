@@ -11,10 +11,13 @@ import androidx.core.view.WindowInsetsCompat;
 
 import org.json.JSONException;
 
+import java.io.IOException;
+import java.io.InputStream;
+
 public class MainActivity extends AppCompatActivity {
-    Skin skin ;
-    org.acoustixaudio.eva.UI ui ;
-    public ConstraintLayout root ;
+    Skin skin;
+    org.acoustixaudio.eva.UI ui;
+    public ConstraintLayout root;
     Utils utils = new Utils(this);
 
     @Override
@@ -31,11 +34,29 @@ public class MainActivity extends AppCompatActivity {
             return insets;
         });
 
-        skin.load () ;
+        skin.load();
         try {
             ui.create();
         } catch (JSONException e) {
             throw new RuntimeException(e);
         }
     }
+
+    String getFileFromAsset(String filename) {
+        String json = null;
+        try {
+            InputStream is = getAssets().open(filename);
+            int size = is.available();
+            byte[] buffer = new byte[size];
+            json = String.valueOf(is.read(buffer));
+            is.close();
+
+
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        return json;
+    }
+
 }

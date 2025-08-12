@@ -8,6 +8,8 @@ import android.util.DisplayMetrics;
 import android.util.Log;
 import android.widget.ImageView;
 
+import org.json.JSONObject;
+
 import java.io.InputStream;
 
 import java.util.HashMap;
@@ -18,8 +20,15 @@ public class Skin {
     AssetManager assets ;
     float scale = 1.0f;
     DisplayMetrics metrics ;
+    HashMap <String, JSONObject> inis = new HashMap<>();
     HashMap <String, BitmapDrawable> skin = new HashMap<>();
     HashMap <String, HashMap<Integer, Bitmap>> states ;
+    String [] ini_filenames = {
+            "region.txt",
+            "viscolor.txt",
+            "pledit.txt"
+    };
+
     String [] filenames = {
             "main_window.jpg",
         "balance.bmp",
@@ -52,6 +61,16 @@ public class Skin {
 
     public void reset () {
         skin.clear();
+        for (String _filename : ini_filenames) {
+            try {
+                InputStream stream = assets.open("classic/" + _filename);
+                inis.put(_filename, Utils.convertIniToJson(stream));
+                stream.close();
+            } catch (Exception e) {
+                Log.e(TAG, "reset: ", e);
+            }
+        }
+
         for (String filename : filenames) {
             try {
                 InputStream stream = assets.open("classic/" + filename);
@@ -84,4 +103,17 @@ public class Skin {
         main();
     }
 
+    public String getFromIni (String filename, String heading, String key) {
+        String value = null;
+        if (inis.containsKey(filename)) {
+            JSONObject jsonObject = inis.get(filename);
+            try {
+                assert jsonObject != null;
+                value = jsonObject.getJSONObject(heading).getString(key);
+            } catch (Exception e) {
+                Log.e(TAG, "getFromIni: ", e);
+            }
+        }
+        return value;
+    }
 }
