@@ -27,6 +27,7 @@ import android.widget.LinearLayout;
 import android.widget.SeekBar;
 import android.widget.ToggleButton;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Objects;
 import java.util.Random;
@@ -36,12 +37,245 @@ public class UI {
 
     MainActivity mainActivity ;
     ImageView mainWindow = null, equalizer ;
-    Button prev, play, pause, next, stop, eject ;
-    ToggleButton shuffle, repeat, toggle_playlist, toggle_eq ;
-    SeekBar seekBar, volume, balance ;
+    ToggleButton toggle_eq ;
     JSONObject skinFormat = null ;
     RecyclerView recyclerView ;
+    ArrayList <SeekBar> eq_slider_list = new ArrayList<>();
+    ArrayList <ImageView> pl_title_list = new ArrayList<>();
+    ArrayList <ImageView> pl_border_left_list = new ArrayList<>();
+    ArrayList <ImageView> pl_border_right_list = new ArrayList<>();
+    private ImageView titleBar;
+    private Button mainClose;
+    private ToggleButton eq_button;
+    private ToggleButton pl_button;
+    private Button prev;
+    private Button play;
+    private Button pause;
+    private Button stop;
+    private Button next;
+    private Button eject;
+    private ImageView mono;
+    private ImageView stereo;
+    private ToggleButton shuffle;
+    private ToggleButton repeat;
+    private SeekBar volume;
+    private SeekBar balance;
+    private SeekBar posbar;
+    private ImageView titleBar_eq;
+    private ToggleButton auto_eq;
+    private Button presets;
+    private ImageView pl_left;
+    private ImageView pl_right;
+    private ImageView pl_title;
+    private ImageView pl_bleft;
+    private ImageView pl_bright;
 
+    public void skin () throws JSONException {
+        paintView(mainWindow, skinFormat.getJSONObject("main_window").getJSONObject("background"), false);
+        paintView(titleBar, skinFormat.getJSONObject("main_window").getJSONObject("title_bar"), false);
+        paintView(mainClose, skinFormat.getJSONObject("main_window").getJSONObject("close"), false);
+        paintView(eq_button, skinFormat.getJSONObject("main_window").getJSONObject("eq_button"), false);
+        paintView(pl_button, skinFormat.getJSONObject("main_window").getJSONObject("pl_button"), false);
+        paintView(prev, skinFormat.getJSONObject("main_window").getJSONObject("prev"), false);
+        paintView(play, skinFormat.getJSONObject("main_window").getJSONObject("play"), false);
+        paintView(pause, skinFormat.getJSONObject("main_window").getJSONObject("pause"), false);
+        paintView(stop, skinFormat.getJSONObject("main_window").getJSONObject("stop"), false);
+        paintView(next, skinFormat.getJSONObject("main_window").getJSONObject("next"), false);
+        paintView(eject, skinFormat.getJSONObject("main_window").getJSONObject("eject"), false);
+        paintView(mono, skinFormat.getJSONObject("main_window").getJSONObject("mono"), false);
+        paintView(stereo, skinFormat.getJSONObject("main_window").getJSONObject("ster"), false);
+        paintView(shuffle, skinFormat.getJSONObject("main_window").getJSONObject("shuffle"), false);
+        paintView(repeat, skinFormat.getJSONObject("main_window").getJSONObject("repeat"), false);
+        paintView(volume, skinFormat.getJSONObject("main_window").getJSONObject("volume"), false);
+        paintView(balance, skinFormat.getJSONObject("main_window").getJSONObject("balance"), false);
+        paintView(posbar, skinFormat.getJSONObject("main_window").getJSONObject("posbar"), false);
+        paintView(equalizer, skinFormat.getJSONObject("equalizer_window").getJSONObject("background"), false);
+        paintView(titleBar_eq, skinFormat.getJSONObject("equalizer_window").getJSONObject("title_bar"), false);
+        paintView(toggle_eq, skinFormat.getJSONObject("equalizer_window").getJSONObject("on_off_button"), false);
+        paintView(auto_eq, skinFormat.getJSONObject("equalizer_window").getJSONObject("auto_button"), false);
+        paintView(presets, skinFormat.getJSONObject("equalizer_window").getJSONObject("presets_button"), false);
+
+        for (int i = 0; i < eq_slider_list.size(); i++) {
+            paintView(eq_slider_list.get(i), skinFormat.getJSONObject("equalizer_window").getJSONArray("sliders").getJSONObject(i), true);
+        }
+
+        int statusBar = (int) ((int) Utils.getStatusBarHeight(mainActivity.getResources()) / mainActivity.skin.scale) + 20; // for some reason bottom of playlist is cut off
+        JSONObject bleft = skinFormat.getJSONObject("playlist").getJSONObject("titlebar").getJSONObject("bleft");
+
+        int height = (int) (mainActivity.skin.metrics.heightPixels / mainActivity.skin.scale) - statusBar - 38;
+        int right = (int) (mainActivity.skin.metrics.widthPixels / mainActivity.skin.scale) - 25;
+        int counter = 0 ;
+        for (int i = 232 ; i < height ; i++) {
+            JSONObject sl = skinFormat.getJSONObject("playlist").getJSONObject("titlebar").getJSONObject("sleft");
+            sl.put("coordinates", new JSONArray(new int[]{0, i, 25, 29}));
+            paintView(pl_border_left_list.get(counter), sl, false);
+            JSONObject sl2 = skinFormat.getJSONObject("playlist").getJSONObject("titlebar").getJSONObject("sright");
+            sl2.put("coordinates", new JSONArray(new int[]{right, i, 25, 29}));
+            paintView(pl_border_right_list.get(counter), sl2, false);
+            counter ++ ;
+        }
+
+        for (int i = 0; i < pl_title_list.size(); i++) {
+            paintView(pl_title_list.get(i), skinFormat.getJSONObject("playlist").getJSONObject("titlebar").getJSONObject("repeat"), false);
+        }
+
+
+        paintView(pl_left, skinFormat.getJSONObject("playlist").getJSONObject("titlebar").getJSONObject("left"), false);
+        paintView(pl_right, skinFormat.getJSONObject("playlist").getJSONObject("titlebar").getJSONObject("right"), false);
+        paintView(pl_title, skinFormat.getJSONObject("playlist").getJSONObject("titlebar").getJSONObject("title"), false);
+        paintView(pl_bleft, skinFormat.getJSONObject("playlist").getJSONObject("titlebar").getJSONObject("bleft"), false);
+        paintView(pl_bright, skinFormat.getJSONObject("playlist").getJSONObject("titlebar").getJSONObject("bright"), false);
+
+        String plColor = ((JSONObject)(mainActivity.skin.inis.get("pledit.txt"))).getJSONObject ("Text").get ("NormalBG").toString();
+        int plColorInt = Color.parseColor(plColor);
+        recyclerView.setBackgroundColor(plColorInt);
+        Log.i(TAG, "plColor: " + plColor);
+    }
+
+    public void create () throws JSONException {
+        mainWindow = (ImageView) createView(skinFormat.getJSONObject("main_window").getJSONObject("background"));
+        mainActivity.root.addView(mainWindow);
+        titleBar = (ImageView) createView(skinFormat.getJSONObject("main_window").getJSONObject("title_bar"));
+        mainActivity.root.addView(titleBar);
+
+        mainClose = (Button) createView(skinFormat.getJSONObject("main_window").getJSONObject("close"));
+//        mainActivity.root.addView(mainClose);
+        eq_button = (ToggleButton) createView(skinFormat.getJSONObject("main_window").getJSONObject("eq_button"));
+        mainActivity.root.addView(eq_button);
+        pl_button = (ToggleButton) createView(skinFormat.getJSONObject("main_window").getJSONObject("pl_button"));
+        mainActivity.root.addView(pl_button);
+
+        prev = (Button) createView(skinFormat.getJSONObject("main_window").getJSONObject("prev"));
+        mainActivity.root.addView(prev);
+        play = (Button) createView(skinFormat.getJSONObject("main_window").getJSONObject("play"));
+        mainActivity.root.addView(play);
+        pause = (Button) createView(skinFormat.getJSONObject("main_window").getJSONObject("pause"));
+        mainActivity.root.addView(pause);
+        stop = (Button) createView(skinFormat.getJSONObject("main_window").getJSONObject("stop"));
+        mainActivity.root.addView(stop);
+        next = (Button) createView(skinFormat.getJSONObject("main_window").getJSONObject("next"));
+        mainActivity.root.addView(next);
+        eject = (Button) createView(skinFormat.getJSONObject("main_window").getJSONObject("eject"));
+        mainActivity.root.addView(eject);
+
+        mono = (ImageView) createView(skinFormat.getJSONObject("main_window").getJSONObject("mono"));
+        mainActivity.root.addView(mono);
+
+        stereo = (ImageView) createView(skinFormat.getJSONObject("main_window").getJSONObject("ster"));
+        mainActivity.root.addView(stereo);
+
+        shuffle = (ToggleButton) createView(skinFormat.getJSONObject("main_window").getJSONObject("shuffle"));
+        mainActivity.root.addView(shuffle);
+        repeat = (ToggleButton) createView(skinFormat.getJSONObject("main_window").getJSONObject("repeat"));
+        mainActivity.root.addView(repeat);
+
+        volume = (SeekBar) createView(skinFormat.getJSONObject("main_window").getJSONObject("volume"));
+        mainActivity.root.addView(volume);
+        balance = (SeekBar) createView(skinFormat.getJSONObject("main_window").getJSONObject("balance"));
+        mainActivity.root.addView(balance);
+        posbar = (SeekBar) createView(skinFormat.getJSONObject("main_window").getJSONObject("posbar"));
+        mainActivity.root.addView(posbar);
+
+        equalizer = (ImageView) createView(skinFormat.getJSONObject("equalizer_window").getJSONObject("background"));
+        mainActivity.root.addView(equalizer);
+
+        titleBar_eq = (ImageView) createView(skinFormat.getJSONObject("equalizer_window").getJSONObject("title_bar"));
+        mainActivity.root.addView(titleBar_eq);
+
+        JSONArray eq_sliders = skinFormat.getJSONObject("equalizer_window").getJSONArray("sliders");
+        for (int i = 0; i < eq_sliders.length(); i++) {
+            if (i == 11)
+                break ;
+            JSONObject slider = eq_sliders.getJSONObject(i);
+//            Log.d(TAG, String.valueOf(i) + " create: " + slider);
+            View seekBar = createView(slider);
+            eq_slider_list.add((SeekBar) seekBar);
+            ((SeekBar) seekBar).setMax(100);
+            ((SeekBar) seekBar).setMin(-100);
+            mainActivity.root.addView(seekBar);
+        }
+
+        toggle_eq = (ToggleButton) createView(skinFormat.getJSONObject("equalizer_window").getJSONObject("on_off_button"));
+        mainActivity.root.addView(toggle_eq);
+        auto_eq = (ToggleButton) createView(skinFormat.getJSONObject("equalizer_window").getJSONObject("auto_button"));
+        mainActivity.root.addView(auto_eq);
+        presets = (Button) createView(skinFormat.getJSONObject("equalizer_window").getJSONObject("presets_button"));
+        mainActivity.root.addView(presets);
+
+        int width = 0 ;
+        int counter = 1 ;
+        while (width < 275) {
+//            Log.i(TAG, "create: adding playlist title bar " + counter ++);
+            JSONObject j = skinFormat.getJSONObject("playlist").getJSONObject("titlebar").getJSONObject("repeat");
+            j.put("coordinates", new JSONArray(new int[]{width, 232, 25, 20}));
+            ImageView pl_item = (ImageView) createView(j);
+            pl_title_list.add(pl_item);
+            mainActivity.root.addView(pl_item);
+            width += 23 ;
+        }
+
+        int statusBar = (int) ((int) Utils.getStatusBarHeight(mainActivity.getResources()) / mainActivity.skin.scale) + 20; // for some reason bottom of playlist is cut off
+        JSONObject bleft = skinFormat.getJSONObject("playlist").getJSONObject("titlebar").getJSONObject("bleft");
+
+        int height = (int) (mainActivity.skin.metrics.heightPixels / mainActivity.skin.scale) - statusBar - 38;
+        int right = (int) (mainActivity.skin.metrics.widthPixels / mainActivity.skin.scale) - 25;
+        for (int i = 232 ; i < height ; i++) {
+            JSONObject sl = skinFormat.getJSONObject("playlist").getJSONObject("titlebar").getJSONObject("sleft");
+            sl.put("coordinates", new JSONArray(new int[]{0, i, 25, 29}));
+            ImageView pl_sleft = (ImageView) createView(sl);
+            pl_border_left_list.add(pl_sleft);
+            mainActivity.root.addView(pl_sleft);
+            JSONObject sl2 = skinFormat.getJSONObject("playlist").getJSONObject("titlebar").getJSONObject("sright");
+            sl2.put("coordinates", new JSONArray(new int[]{right, i, 25, 29}));
+            ImageView pl_sleft2 = (ImageView) createView(sl2);
+            mainActivity.root.addView(pl_sleft2);
+            pl_border_right_list.add(pl_sleft2);
+
+        }
+
+        pl_left = (ImageView) createView(skinFormat.getJSONObject("playlist").getJSONObject("titlebar").getJSONObject("left"));
+        mainActivity.root.addView(pl_left);
+        pl_right = (ImageView) createView(skinFormat.getJSONObject("playlist").getJSONObject("titlebar").getJSONObject("right"));
+        mainActivity.root.addView(pl_right);
+
+        pl_title = (ImageView) createView(skinFormat.getJSONObject("playlist").getJSONObject("titlebar").getJSONObject("title"));
+        mainActivity.root.addView(pl_title);
+
+        int bly = bleft.getJSONArray("coordinates").getInt(3);
+        bly = (int)(mainActivity.skin.metrics.heightPixels / mainActivity.skin.scale) - bly - statusBar;
+//        Log.i(TAG, "create: bottom left " + bly);
+        bleft.put("coordinates", new JSONArray(new int[]{0, bly, 125, 38}));
+
+        JSONObject blr = skinFormat.getJSONObject("playlist").getJSONObject("titlebar").getJSONObject("bright");
+        blr.put("coordinates", new JSONArray(
+                new int[]{
+                        (int)(mainActivity.skin.metrics.widthPixels / mainActivity.skin.scale) - 150,
+                        (int)(mainActivity.skin.metrics.heightPixels / mainActivity.skin.scale) - statusBar - 38,
+                        150, 38
+                }));
+
+        pl_bleft = (ImageView) createView(bleft);
+        mainActivity.root.addView(pl_bleft);
+        pl_bright = (ImageView) createView(blr);
+        mainActivity.root.addView(pl_bright);
+
+        recyclerView = new RecyclerView(mainActivity);
+        int rw = (int) (250 * mainActivity.skin.scale);
+        int rh = (int) (mainActivity.skin.metrics.heightPixels - ((statusBar + 116 + 38 + 140) * mainActivity.skin.scale));
+        int marginLeft = 12;
+        marginLeft = (int) (marginLeft * mainActivity.skin.scale) ;
+        int marginTop = 252;
+        marginTop = (int) (marginTop * mainActivity.skin.scale) ;
+
+        ConstraintLayout.LayoutParams params = new ConstraintLayout.LayoutParams(rw, rh);
+        params.setMargins(marginLeft, marginTop, 0, 0);
+        params.topToTop = ConstraintLayout.LayoutParams.PARENT_ID;
+        params.startToStart = ConstraintLayout.LayoutParams.PARENT_ID;
+        recyclerView.setLayoutParams(params);
+        mainActivity.root.addView(recyclerView);
+
+        skin();
+    }
 
     UI (MainActivity _mainActivity) {
         mainActivity = _mainActivity;
@@ -113,131 +347,134 @@ public class UI {
 
         }
 
-        if (view != null) {
-            Bitmap bitmap = mainActivity.skin.skin.get(component.getString("source")).getBitmap();
-            if (component.has("source_rect")) {
-                JSONArray source_rect = component.getJSONArray("source_rect");
-                Bitmap scaledBitmap = getCroppedScaledBitmap(bitmap, source_rect);
-                if (rotated) {
-                    Matrix matrix = new Matrix();
-                    matrix.postRotate(90);
-                    scaledBitmap = Bitmap.createBitmap(scaledBitmap, 0, 0, scaledBitmap.getWidth(), scaledBitmap.getHeight(), matrix, true);
-                }
-                view.setBackground(new android.graphics.drawable.BitmapDrawable(mainActivity.getResources(), scaledBitmap));
+//        if (view != null) {
+//            paintView (view, component, rotated);
+//        }
 
-                if (view instanceof ToggleButton) {
-                    HashMap <Integer, Bitmap> states = new HashMap<>();
-                    states.put(1, scaledBitmap);
-                    Bitmap toggled = getCroppedScaledBitmap(bitmap, component.getJSONArray("source_rect_on"));
-                    states.put(0, toggled);
-                    mainActivity.skin.states.put(component.getString("name"), states);
-                    ToggleButton toggleButton = (ToggleButton) view;
-                    toggleButton.setOnCheckedChangeListener(new ToggleButton.OnCheckedChangeListener() {
-                        final String name = component.getString("name") ;
-                        @Override
-                        public void onCheckedChanged(@NonNull CompoundButton compoundButton, boolean b) {
-                            if (b) {
-                                compoundButton.setBackground(new BitmapDrawable(mainActivity.getResources(), mainActivity.skin.states.get(name).get(1)));
-                            } else {
-                                compoundButton.setBackground(new BitmapDrawable(mainActivity.getResources(), mainActivity.skin.states.get(name).get(0)));
-                            }
+        return view ;
+    }
+
+    void paintView (View view, JSONObject component, boolean rotated) throws JSONException {
+        Bitmap bitmap = mainActivity.skin.skin.get(component.getString("source")).getBitmap();
+        if (component.has("source_rect")) {
+            JSONArray source_rect = component.getJSONArray("source_rect");
+            Bitmap scaledBitmap = getCroppedScaledBitmap(bitmap, source_rect);
+            if (rotated) {
+                Matrix matrix = new Matrix();
+                matrix.postRotate(90);
+                scaledBitmap = Bitmap.createBitmap(scaledBitmap, 0, 0, scaledBitmap.getWidth(), scaledBitmap.getHeight(), matrix, true);
+            }
+            view.setBackground(new android.graphics.drawable.BitmapDrawable(mainActivity.getResources(), scaledBitmap));
+
+            if (view instanceof ToggleButton) {
+                HashMap <Integer, Bitmap> states = new HashMap<>();
+                states.put(1, scaledBitmap);
+                Bitmap toggled = getCroppedScaledBitmap(bitmap, component.getJSONArray("source_rect_on"));
+                states.put(0, toggled);
+                mainActivity.skin.states.put(component.getString("name"), states);
+                ToggleButton toggleButton = (ToggleButton) view;
+                toggleButton.setOnCheckedChangeListener(new ToggleButton.OnCheckedChangeListener() {
+                    final String name = component.getString("name") ;
+                    @Override
+                    public void onCheckedChanged(@NonNull CompoundButton compoundButton, boolean b) {
+                        if (b) {
+                            compoundButton.setBackground(new BitmapDrawable(mainActivity.getResources(), mainActivity.skin.states.get(name).get(1)));
+                        } else {
+                            compoundButton.setBackground(new BitmapDrawable(mainActivity.getResources(), mainActivity.skin.states.get(name).get(0)));
                         }
-                    });
-                }
+                    }
+                });
+            }
 
-                if (view instanceof SeekBar) {
-                    SeekBar seekBar = (SeekBar) view;
-                    JSONArray source_rect1 = component.getJSONArray("thumb");
-                    int x1 = source_rect1.getInt(0);
-                    int y1 = source_rect1.getInt(1);
-                    int width1 = source_rect1.getInt(2);// - x;
-                    int height1 = source_rect1.getInt(3);//- y;
+            if (view instanceof SeekBar) {
+                SeekBar seekBar = (SeekBar) view;
+                JSONArray source_rect1 = component.getJSONArray("thumb");
+                int x1 = source_rect1.getInt(0);
+                int y1 = source_rect1.getInt(1);
+                int width1 = source_rect1.getInt(2);// - x;
+                int height1 = source_rect1.getInt(3);//- y;
 
 //                    Log.d(TAG, String.format("[thumb] %d x %d: %d x %d", x1, y1, width1, height1));
-                    Bitmap croppedBitmap1 = Bitmap.createBitmap(bitmap, x1, y1, width1, height1, null, true);
-                    width1 = (int) (croppedBitmap1.getWidth() * mainActivity.skin.scale);
-                    height1 = (int) (croppedBitmap1.getHeight() * mainActivity.skin.scale);
+                Bitmap croppedBitmap1 = Bitmap.createBitmap(bitmap, x1, y1, width1, height1, null, true);
+                width1 = (int) (croppedBitmap1.getWidth() * mainActivity.skin.scale);
+                height1 = (int) (croppedBitmap1.getHeight() * mainActivity.skin.scale);
 //                    Log.d(TAG, String.format("[thumb size]: %d x %d", width1, height1));
-                    Bitmap scaledBitmap1 = Bitmap.createScaledBitmap(croppedBitmap1, width1, height1, true);
-                    Drawable thumbDrawable = new BitmapDrawable(mainActivity.getResources(), scaledBitmap1);
+                Bitmap scaledBitmap1 = Bitmap.createScaledBitmap(croppedBitmap1, width1, height1, true);
+                Drawable thumbDrawable = new BitmapDrawable(mainActivity.getResources(), scaledBitmap1);
 
-                    if (! rotated)
-                        seekBar.setThumb(thumbDrawable);
-                    else {
-                        Matrix matrix = new Matrix();
-                        matrix.postRotate(270);
-                        scaledBitmap1 = Bitmap.createBitmap(scaledBitmap1, 0, 0, scaledBitmap1.getWidth(), scaledBitmap1.getHeight(), matrix, true);
-                        thumbDrawable = new BitmapDrawable(mainActivity.getResources(), scaledBitmap1);
-                        seekBar.setThumb(thumbDrawable);
-                    }
+                if (! rotated)
+                    seekBar.setThumb(thumbDrawable);
+                else {
+                    Matrix matrix = new Matrix();
+                    matrix.postRotate(270);
+                    scaledBitmap1 = Bitmap.createBitmap(scaledBitmap1, 0, 0, scaledBitmap1.getWidth(), scaledBitmap1.getHeight(), matrix, true);
+                    thumbDrawable = new BitmapDrawable(mainActivity.getResources(), scaledBitmap1);
+                    seekBar.setThumb(thumbDrawable);
+                }
 
-                    if (component.has("bg") && component.getBoolean("bg")) {
-                        int x = source_rect.getInt(0);
-                        int y = source_rect.getInt(1);
-                        int width = source_rect.getInt(2);// - x;
-                        int height = source_rect.getInt(3);//- y;
-                        int swidth = (int) (width * mainActivity.skin.scale);
-                        int sheight = (int) (height * mainActivity.skin.scale);
-                        HashMap<Integer, Bitmap> states = new HashMap<>();
-                        for (int i = 0; i < 28; i++) {
-                            int y_ = y + (height * i);
-                            if (i > 0)
-                                y_ = y_ + i;
+                if (component.has("bg") && component.getBoolean("bg")) {
+                    int x = source_rect.getInt(0);
+                    int y = source_rect.getInt(1);
+                    int width = source_rect.getInt(2);// - x;
+                    int height = source_rect.getInt(3);//- y;
+                    int swidth = (int) (width * mainActivity.skin.scale);
+                    int sheight = (int) (height * mainActivity.skin.scale);
+                    HashMap<Integer, Bitmap> states = new HashMap<>();
+                    for (int i = 0; i < 28; i++) {
+                        int y_ = y + (height * i);
+                        if (i > 0)
+                            y_ = y_ + i;
 
 //                            Log.d(TAG, String.format("[%s]: %d, %d %d %d %d", component.get("source"), i, x, y_, width, height));
-                            if (y_ < 0) y_ = 0;
-                            Bitmap bg = Bitmap.createBitmap(bitmap, x, y_, width, height, null, true);
-                            Bitmap bgs = Bitmap.createScaledBitmap(bg, (int) (swidth), (int) (sheight), true);
-                            states.put(i, bgs);
-                        }
+                        if (y_ < 0) y_ = 0;
+                        Bitmap bg = Bitmap.createBitmap(bitmap, x, y_, width, height, null, true);
+                        Bitmap bgs = Bitmap.createScaledBitmap(bg, (int) (swidth), (int) (sheight), true);
+                        states.put(i, bgs);
+                    }
 
 //                        Log.d(TAG, String.format("put %s: %d", component.getString("source"), states.size()));
-                        mainActivity.skin.states.put(component.getString("name"), states);
-                        seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-                            final String name = component.getString("name");
+                    mainActivity.skin.states.put(component.getString("name"), states);
+                    seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+                        final String name = component.getString("name");
 
-                            @Override
-                            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+                        @Override
+                        public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
 //                            Log.d(TAG, "All component names with states:");
 //                            for (String componentNameKey : mainActivity.skin.states.keySet()) {
 //                                Log.d(TAG, "Component Key: " + componentNameKey);
 //                            }
 
-                                int key = (int) ((i / 100.0f) * 27);
-                                Bitmap bit = null;
+                            int key = (int) ((i / 100.0f) * 27);
+                            Bitmap bit = null;
 //                                Log.d(TAG, String.format("%s %d: %d", name, i, key));
-                                if (!mainActivity.skin.states.containsKey(name)) {
-                                    Log.e(TAG, String.format("onProgressChanged: no %s in states!", name));
-                                    return;
-                                }
+                            if (!mainActivity.skin.states.containsKey(name)) {
+                                Log.e(TAG, String.format("onProgressChanged: no %s in states!", name));
+                                return;
+                            }
 
-                                HashMap<Integer, Bitmap> state = mainActivity.skin.states.get(name);
-                                assert state != null;
-                                bit = state.get(key);
-                                seekBar.setBackground(new BitmapDrawable(bit));
+                            HashMap<Integer, Bitmap> state = mainActivity.skin.states.get(name);
+                            assert state != null;
+                            bit = state.get(key);
+                            seekBar.setBackground(new BitmapDrawable(bit));
 //                                Log.i(TAG, "onProgressChanged: bitmap changed");
-                            }
+                        }
 
-                            @Override
-                            public void onStartTrackingTouch(SeekBar seekBar) {
+                        @Override
+                        public void onStartTrackingTouch(SeekBar seekBar) {
 
-                            }
+                        }
 
-                            @Override
-                            public void onStopTrackingTouch(SeekBar seekBar) {
+                        @Override
+                        public void onStopTrackingTouch(SeekBar seekBar) {
 
-                            }
-                        });
-                    }
+                        }
+                    });
                 }
-
             }
 
         }
 
-        return view ;
     }
-
 
     Bitmap getCroppedScaledBitmap (Bitmap bitmap, JSONArray source_rect) throws JSONException {
         int x = source_rect.getInt(0);
@@ -252,147 +489,4 @@ public class UI {
         return scaledBitmap;
     }
 
-    public void create () throws JSONException {
-        mainWindow = (ImageView) createView(skinFormat.getJSONObject("main_window").getJSONObject("background"));
-        mainActivity.root.addView(mainWindow);
-        ImageView titleBar = (ImageView) createView(skinFormat.getJSONObject("main_window").getJSONObject("title_bar"));
-        mainActivity.root.addView(titleBar);
-
-        Button mainClose = (Button) createView(skinFormat.getJSONObject("main_window").getJSONObject("close"));
-//        mainActivity.root.addView(mainClose);
-        ToggleButton eq_button = (ToggleButton) createView(skinFormat.getJSONObject("main_window").getJSONObject("eq_button"));
-        mainActivity.root.addView(eq_button);
-        ToggleButton pl_button = (ToggleButton) createView(skinFormat.getJSONObject("main_window").getJSONObject("pl_button"));
-        mainActivity.root.addView(pl_button);
-
-        Button prev = (Button) createView(skinFormat.getJSONObject("main_window").getJSONObject("prev"));
-        mainActivity.root.addView(prev);
-        Button play = (Button) createView(skinFormat.getJSONObject("main_window").getJSONObject("play"));
-        mainActivity.root.addView(play);
-        Button pause = (Button) createView(skinFormat.getJSONObject("main_window").getJSONObject("pause"));
-        mainActivity.root.addView(pause);
-        Button stop = (Button) createView(skinFormat.getJSONObject("main_window").getJSONObject("stop"));
-        mainActivity.root.addView(stop);
-        Button next = (Button) createView(skinFormat.getJSONObject("main_window").getJSONObject("next"));
-        mainActivity.root.addView(next);
-        Button eject = (Button) createView(skinFormat.getJSONObject("main_window").getJSONObject("eject"));
-        mainActivity.root.addView(eject);
-
-        ImageView mono = (ImageView) createView(skinFormat.getJSONObject("main_window").getJSONObject("mono"));
-        mainActivity.root.addView(mono);
-
-        ImageView stereo = (ImageView) createView(skinFormat.getJSONObject("main_window").getJSONObject("ster"));
-        mainActivity.root.addView(stereo);
-
-        ToggleButton shuffle = (ToggleButton) createView(skinFormat.getJSONObject("main_window").getJSONObject("shuffle"));
-        mainActivity.root.addView(shuffle);
-        ToggleButton repeat = (ToggleButton) createView(skinFormat.getJSONObject("main_window").getJSONObject("repeat"));
-        mainActivity.root.addView(repeat);
-
-        SeekBar volume = (SeekBar) createView(skinFormat.getJSONObject("main_window").getJSONObject("volume"));
-        mainActivity.root.addView(volume);
-        SeekBar balance = (SeekBar) createView(skinFormat.getJSONObject("main_window").getJSONObject("balance"));
-        mainActivity.root.addView(balance);
-        SeekBar posbar = (SeekBar) createView(skinFormat.getJSONObject("main_window").getJSONObject("posbar"));
-        mainActivity.root.addView(posbar);
-
-        equalizer = (ImageView) createView(skinFormat.getJSONObject("equalizer_window").getJSONObject("background"));
-        mainActivity.root.addView(equalizer);
-
-        ImageView titleBar_eq = (ImageView) createView(skinFormat.getJSONObject("equalizer_window").getJSONObject("title_bar"));
-        mainActivity.root.addView(titleBar_eq);
-
-        JSONArray eq_sliders = skinFormat.getJSONObject("equalizer_window").getJSONArray("sliders");
-        for (int i = 0; i < eq_sliders.length(); i++) {
-            if (i == 11)
-                break ;
-            JSONObject slider = eq_sliders.getJSONObject(i);
-//            Log.d(TAG, String.valueOf(i) + " create: " + slider);
-            View seekBar = createView(slider);
-            ((SeekBar) seekBar).setMax(100);
-            ((SeekBar) seekBar).setMin(-100);
-            mainActivity.root.addView(seekBar);
-        }
-
-        toggle_eq = (ToggleButton) createView(skinFormat.getJSONObject("equalizer_window").getJSONObject("on_off_button"));
-        mainActivity.root.addView(toggle_eq);
-        ToggleButton auto_eq = (ToggleButton) createView(skinFormat.getJSONObject("equalizer_window").getJSONObject("auto_button"));
-        mainActivity.root.addView(auto_eq);
-        Button presets = (Button) createView(skinFormat.getJSONObject("equalizer_window").getJSONObject("presets_button"));
-        mainActivity.root.addView(presets);
-
-        int width = 0 ;
-        int counter = 1 ;
-        while (width < 275) {
-//            Log.i(TAG, "create: adding playlist title bar " + counter ++);
-            JSONObject j = skinFormat.getJSONObject("playlist").getJSONObject("titlebar").getJSONObject("repeat");
-            j.put("coordinates", new JSONArray(new int[]{width, 232, 25, 20}));
-            ImageView pl_item = (ImageView) createView(j);
-            mainActivity.root.addView(pl_item);
-            width += 23 ;
-        }
-
-        int statusBar = (int) ((int) Utils.getStatusBarHeight(mainActivity.getResources()) / mainActivity.skin.scale) + 20; // for some reason bottom of playlist is cut off
-        JSONObject bleft = skinFormat.getJSONObject("playlist").getJSONObject("titlebar").getJSONObject("bleft");
-
-        int height = (int) (mainActivity.skin.metrics.heightPixels / mainActivity.skin.scale) - statusBar - 38;
-        int right = (int) (mainActivity.skin.metrics.widthPixels / mainActivity.skin.scale) - 25;
-        for (int i = 232 ; i < height ; i++) {
-            JSONObject sl = skinFormat.getJSONObject("playlist").getJSONObject("titlebar").getJSONObject("sleft");
-            sl.put("coordinates", new JSONArray(new int[]{0, i, 25, 29}));
-            ImageView pl_sleft = (ImageView) createView(sl);
-            mainActivity.root.addView(pl_sleft);
-            JSONObject sl2 = skinFormat.getJSONObject("playlist").getJSONObject("titlebar").getJSONObject("sright");
-            sl2.put("coordinates", new JSONArray(new int[]{right, i, 25, 29}));
-            ImageView pl_sleft2 = (ImageView) createView(sl2);
-            mainActivity.root.addView(pl_sleft2);
-
-        }
-
-        ImageView pl_left = (ImageView) createView(skinFormat.getJSONObject("playlist").getJSONObject("titlebar").getJSONObject("left"));
-        mainActivity.root.addView(pl_left);
-        ImageView pl_right = (ImageView) createView(skinFormat.getJSONObject("playlist").getJSONObject("titlebar").getJSONObject("right"));
-        mainActivity.root.addView(pl_right);
-
-        ImageView pl_title = (ImageView) createView(skinFormat.getJSONObject("playlist").getJSONObject("titlebar").getJSONObject("title"));
-        mainActivity.root.addView(pl_title);
-
-        int bly = bleft.getJSONArray("coordinates").getInt(3);
-        bly = (int)(mainActivity.skin.metrics.heightPixels / mainActivity.skin.scale) - bly - statusBar;
-//        Log.i(TAG, "create: bottom left " + bly);
-        bleft.put("coordinates", new JSONArray(new int[]{0, bly, 125, 38}));
-
-        JSONObject blr = skinFormat.getJSONObject("playlist").getJSONObject("titlebar").getJSONObject("bright");
-        blr.put("coordinates", new JSONArray(
-                new int[]{
-                        (int)(mainActivity.skin.metrics.widthPixels / mainActivity.skin.scale) - 150,
-                        (int)(mainActivity.skin.metrics.heightPixels / mainActivity.skin.scale) - statusBar - 38,
-                        150, 38
-                }));
-
-        ImageView pl_bleft = (ImageView) createView(bleft);
-        mainActivity.root.addView(pl_bleft);
-        ImageView pl_bright = (ImageView) createView(blr);
-        mainActivity.root.addView(pl_bright);
-
-        recyclerView = new RecyclerView(mainActivity);
-        int rw = (int) (250 * mainActivity.skin.scale);
-        int rh = (int) (mainActivity.skin.metrics.heightPixels - ((statusBar + 116 + 38 + 140) * mainActivity.skin.scale));
-        int marginLeft = 12;
-        marginLeft = (int) (marginLeft * mainActivity.skin.scale) ;
-        int marginTop = 252;
-        marginTop = (int) (marginTop * mainActivity.skin.scale) ;
-
-        ConstraintLayout.LayoutParams params = new ConstraintLayout.LayoutParams(rw, rh);
-        params.setMargins(marginLeft, marginTop, 0, 0);
-        params.topToTop = ConstraintLayout.LayoutParams.PARENT_ID;
-        params.startToStart = ConstraintLayout.LayoutParams.PARENT_ID;
-        recyclerView.setLayoutParams(params);
-        mainActivity.root.addView(recyclerView);
-
-        String plColor = ((JSONObject)(mainActivity.skin.inis.get("pledit.txt"))).getJSONObject ("Text").get ("NormalBG").toString();
-        int plColorInt = Color.parseColor(plColor);
-        recyclerView.setBackgroundColor(plColorInt);
-        Log.i(TAG, "plColor: " + plColor);
-    }
 }
