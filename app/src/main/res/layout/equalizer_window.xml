@@ -17,7 +17,7 @@
         android:textOff=""
         android:textOn=""
         android:text=""
-        android:id="@+id/toggleButton"
+        android:id="@+id/toggleButton1"
         android:layout_width="37dp"
         android:layout_height="19dp"
         android:background="@color/beige"
