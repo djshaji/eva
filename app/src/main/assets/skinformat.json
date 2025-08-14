@@ -109,18 +109,18 @@
 
     "mono": {
       "name": "Mono Stereo",
-      "coordinates": [212, 44, 27, 12],
+      "coordinates": [212, 43, 27, 10],
       "source": "monoster.bmp",
       "type": "image",
-      "source_rect": [29, 12, 27, 12]
+      "source_rect": [29, 12, 27, 10]
     },
 
     "ster": {
       "name": "Stereo",
-      "coordinates": [240, 44, 27, 12],
+      "coordinates": [241, 43, 27, 10],
       "source": "monoster.bmp",
       "type": "image",
-      "source_rect": [0, 0, 29, 12]
+      "source_rect": [0, 0, 29, 10]
     },
 
     "volume": {
@@ -135,16 +135,16 @@
 
     "balance": {
       "name": "Balance Bar",
-      "coordinates": [169, 57, 65, 14],
+      "coordinates": [174, 57, 39, 14],
       "bg": true,
       "source": "balance.bmp",
       "type": "seekbar",
-      "source_rect": [0, 0, 68, 14],
+      "source_rect": [8, 0, 39, 14],
       "thumb": [15, 422, 14, 11]
     },
     "posbar": {
       "name": "Seek Bar",
-      "coordinates": [20, 70, 249, 10],
+      "coordinates": [17, 72, 249, 10],
       "source": "posbar.bmp",
       "type": "seekbar",
       "source_rect": [0, 0, 249, 10],
@@ -309,117 +309,117 @@
     "sliders": [
       {
         "name": "preamp",
-        "coordinates": [-4, 176, 14, 64],
+        "coordinates": [-4, 179, 14, 64],
         "source": "eqmain.bmp",
         "vertical": true,
         "type": "seekbar",
         "source_rect": [13, 164, 14, 64],
-        "thumb": [0, 164, 11, 12],
+        "thumb": [0, 164, 11, 11],
         "slider_thumb_ref": "slider_thumb"
       },
       {
         "name": "60Hz",
-        "coordinates": [54, 176, 14, 64],
+        "coordinates": [54, 179, 14, 64],
         "source": "eqmain.bmp",
         "vertical": true,
         "type": "seekbar",
         "source_rect": [13, 164, 14, 64],
-        "thumb": [0, 164, 11, 12],
+        "thumb": [0, 164, 11, 11],
         "slider_thumb_ref": "slider_thumb"
       },
       {
         "name": "170Hz",
-        "coordinates": [73, 176, 14, 64],
+        "coordinates": [73, 179, 14, 64],
         "source": "eqmain.bmp",
         "vertical": true,
         "type": "seekbar",
         "source_rect": [13, 164, 14, 64],
-        "thumb": [0, 164, 11, 12],
+        "thumb": [0, 164, 11, 11],
         "slider_thumb_ref": "slider_thumb"
       },
       {
         "name": "310Hz",
-        "coordinates": [91, 176, 14, 64],
+        "coordinates": [91, 179, 14, 64],
         "source": "eqmain.bmp",
         "vertical": true,
         "type": "seekbar",
         "source_rect": [13, 164, 14, 64],
-        "thumb": [0, 164, 11, 12],
+        "thumb": [0, 164, 11, 11],
         "slider_thumb_ref": "slider_thumb"
       },
       {
         "name": "600Hz",
-        "coordinates": [109, 176, 14, 64],
+        "coordinates": [109, 179, 14, 64],
         "source": "eqmain.bmp",
         "vertical": true,
         "type": "seekbar",
         "source_rect": [13, 164, 14, 64],
-        "thumb": [0, 164, 11, 12],
+        "thumb": [0, 164, 11, 11],
         "slider_thumb_ref": "slider_thumb"
       },
       {
         "name": "1kHz",
-        "coordinates": [127, 176, 14, 64],
+        "coordinates": [127, 179, 14, 64],
         "source": "eqmain.bmp",
         "vertical": true,
         "type": "seekbar",
         "source_rect": [13, 164, 14, 64],
-        "thumb": [0, 164, 11, 12],
+        "thumb": [0, 164, 11, 11],
         "slider_thumb_ref": "slider_thumb"
       },
       {
         "name": "3kHz",
-        "coordinates": [145, 176, 14, 64],
+        "coordinates": [145, 179, 14, 64],
         "source": "eqmain.bmp",
         "vertical": true,
         "type": "seekbar",
         "source_rect": [13, 164, 14, 64],
-        "thumb": [0, 164, 11, 12],
+        "thumb": [0, 164, 11, 11],
         "slider_thumb_ref": "slider_thumb"
       },
       {
         "name": "6kHz",
-        "coordinates": [163, 176, 14, 64],
+        "coordinates": [163, 179, 14, 64],
         "source": "eqmain.bmp",
         "vertical": true,
         "type": "seekbar",
         "source_rect": [13, 164, 14, 64],
-        "thumb": [0, 164, 11, 12],
+        "thumb": [0, 164, 11, 11],
         "slider_thumb_ref": "slider_thumb"
       },
       {
         "name": "12kHz",
-        "coordinates": [181, 176, 14, 64],
+        "coordinates": [181, 179, 14, 64],
         "source": "eqmain.bmp",
         "vertical": true,
         "type": "seekbar",
         "source_rect": [13, 164, 14, 64],
-        "thumb": [0, 164, 11, 12],
+        "thumb": [0, 164, 11, 11],
         "slider_thumb_ref": "slider_thumb"
       },
       {
         "name": "14kHz",
-        "coordinates": [199, 176, 14, 64],
+        "coordinates": [199, 179, 14, 64],
         "source": "eqmain.bmp",
         "vertical": true,
         "type": "seekbar",
         "source_rect": [13, 164, 14, 64],
-        "thumb": [0, 164, 11, 12],
+        "thumb": [0, 164, 11, 11],
         "slider_thumb_ref": "slider_thumb"
       },
       {
         "name": "16kHz",
-        "coordinates": [216, 176, 14, 64],
+        "coordinates": [216, 179, 14, 64],
         "source": "eqmain.bmp",
         "vertical": true,
         "type": "seekbar",
         "source_rect": [13, 164, 14, 64],
-        "thumb": [0, 164, 11, 12],
+        "thumb": [0, 164, 11, 11],
         "slider_thumb_ref": "slider_thumb"
       }
     ],
     "on_off_button": {
-      "coordinates": [16, 134, 25, 12],
+      "coordinates": [14, 134, 25, 12],
       "source": "eqmain.bmp",
       "type": "toggle",
       "source_rect": [10, 119, 25, 12],
@@ -427,7 +427,7 @@
       "name": "EQ ON/OFF button"
     },
     "auto_button": {
-      "coordinates": [42, 134, 32, 12],
+      "coordinates": [40, 134, 32, 12],
       "source": "eqmain.bmp",
       "source_rect": [36, 119, 32, 12],
       "source_rect_on": [95, 119, 32, 12],

@@ -5,6 +5,10 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.io.File;
+import java.io.FileOutputStream;
 
 import androidx.annotation.NonNull;
 import androidx.constraintlayout.widget.ConstraintLayout;
@@ -69,8 +73,10 @@ public class UI {
     private ImageView pl_title;
     private ImageView pl_bleft;
     private ImageView pl_bright;
+    public Button logoBtn;
 
     public void skin () throws JSONException {
+        Log.d(TAG, "skin() called");
         paintView(mainWindow, skinFormat.getJSONObject("main_window").getJSONObject("background"), false);
         paintView(titleBar, skinFormat.getJSONObject("main_window").getJSONObject("title_bar"), false);
         paintView(mainClose, skinFormat.getJSONObject("main_window").getJSONObject("close"), false);
@@ -135,6 +141,16 @@ public class UI {
     public void create () throws JSONException {
         mainWindow = (ImageView) createView(skinFormat.getJSONObject("main_window").getJSONObject("background"));
         mainActivity.root.addView(mainWindow);
+
+        logoBtn = new Button(mainActivity);
+        logoBtn.setBackgroundColor(mainActivity.getResources().getColor(android.R.color.transparent));
+        int logoSize = (int) (20 * mainActivity.skin.scale);
+        ConstraintLayout.LayoutParams lparams = new ConstraintLayout.LayoutParams(logoSize, logoSize);
+        lparams.setMargins((int) (245 * mainActivity.skin.scale), (int) (86 * mainActivity.skin.scale),  0, 0);
+        lparams.topToTop = ConstraintLayout.LayoutParams.PARENT_ID;
+        lparams.startToStart = ConstraintLayout.LayoutParams.PARENT_ID;
+        mainActivity.root.addView(logoBtn, lparams);
+
         titleBar = (ImageView) createView(skinFormat.getJSONObject("main_window").getJSONObject("title_bar"));
         mainActivity.root.addView(titleBar);
 
@@ -394,22 +410,29 @@ public class UI {
                 int width1 = source_rect1.getInt(2);// - x;
                 int height1 = source_rect1.getInt(3);//- y;
 
-//                    Log.d(TAG, String.format("[thumb] %d x %d: %d x %d", x1, y1, width1, height1));
-                Bitmap croppedBitmap1 = Bitmap.createBitmap(bitmap, x1, y1, width1, height1, null, true);
-                width1 = (int) (croppedBitmap1.getWidth() * mainActivity.skin.scale);
-                height1 = (int) (croppedBitmap1.getHeight() * mainActivity.skin.scale);
+                Log.d(TAG, String.format("[thumb] %d x %d: %d x %d", x1, y1, width1, height1));
+//                Log.d(TAG, "paintView: " + component);
+                try {
+                    Bitmap croppedBitmap1 = Bitmap.createBitmap(bitmap, x1, y1, width1, height1, null, true);
+                    width1 = (int) (croppedBitmap1.getWidth() * mainActivity.skin.scale);
+                    height1 = (int) (croppedBitmap1.getHeight() * mainActivity.skin.scale);
 //                    Log.d(TAG, String.format("[thumb size]: %d x %d", width1, height1));
-                Bitmap scaledBitmap1 = Bitmap.createScaledBitmap(croppedBitmap1, width1, height1, true);
-                Drawable thumbDrawable = new BitmapDrawable(mainActivity.getResources(), scaledBitmap1);
+                    Bitmap scaledBitmap1 = Bitmap.createScaledBitmap(croppedBitmap1, width1, height1, true);
+                    Drawable thumbDrawable = new BitmapDrawable(mainActivity.getResources(), scaledBitmap1);
 
-                if (! rotated)
-                    seekBar.setThumb(thumbDrawable);
-                else {
-                    Matrix matrix = new Matrix();
-                    matrix.postRotate(270);
-                    scaledBitmap1 = Bitmap.createBitmap(scaledBitmap1, 0, 0, scaledBitmap1.getWidth(), scaledBitmap1.getHeight(), matrix, true);
-                    thumbDrawable = new BitmapDrawable(mainActivity.getResources(), scaledBitmap1);
-                    seekBar.setThumb(thumbDrawable);
+                    if (!rotated)
+                        seekBar.setThumb(thumbDrawable);
+                    else {
+                        Matrix matrix = new Matrix();
+                        matrix.postRotate(90);
+
+                        scaledBitmap1 = Bitmap.createBitmap(scaledBitmap1, 0, 0, scaledBitmap1.getWidth(), scaledBitmap1.getHeight(), matrix, true);
+                        thumbDrawable = new BitmapDrawable(mainActivity.getResources(), scaledBitmap1);
+                        seekBar.setThumb(thumbDrawable);
+                    }
+                } catch (Exception e) {
+//                    throw new RuntimeException(e);
+                    Log.e(TAG, "paintView: the skin doesnt have thumb it seems", e);
                 }
 
                 if (component.has("bg") && component.getBoolean("bg")) {
@@ -427,6 +450,10 @@ public class UI {
 
 //                            Log.d(TAG, String.format("[%s]: %d, %d %d %d %d", component.get("source"), i, x, y_, width, height));
                         if (y_ < 0) y_ = 0;
+                        if (x + width > bitmap.getWidth())
+                            width = bitmap.getWidth() - x;
+                        if (y_ + height > bitmap.getHeight())
+                            height = bitmap.getHeight() - y_;
                         Bitmap bg = Bitmap.createBitmap(bitmap, x, y_, width, height, null, true);
                         Bitmap bgs = Bitmap.createScaledBitmap(bg, (int) (swidth), (int) (sheight), true);
                         states.put(i, bgs);
@@ -481,6 +508,10 @@ public class UI {
         int y = source_rect.getInt(1);
         int width = source_rect.getInt(2) ;// - x;
         int height = source_rect.getInt(3) ;//- y;
+        if (x + width > bitmap.getWidth())
+            width = bitmap.getWidth() - x;
+        if (y + height > bitmap.getHeight())
+            height = bitmap.getHeight() - y;
         Bitmap croppedBitmap = Bitmap.createBitmap(bitmap, x, y, width, height, null, true);
         width = (int) (width * mainActivity.skin.scale);
         height = (int) (height * mainActivity.skin.scale);
@@ -488,5 +519,6 @@ public class UI {
         Bitmap scaledBitmap = Bitmap.createScaledBitmap(croppedBitmap, (int) (width), (int)(height), true);
         return scaledBitmap;
     }
+
 
 }

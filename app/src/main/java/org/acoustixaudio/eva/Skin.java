@@ -10,6 +10,7 @@ import android.widget.ImageView;
 
 import org.json.JSONObject;
 
+import java.io.FileInputStream;
 import java.io.InputStream;
 
 import java.util.HashMap;
@@ -63,7 +64,7 @@ public class Skin {
         skin.clear();
         for (String _filename : ini_filenames) {
             try {
-                InputStream stream = assets.open("classic/" + _filename);
+                InputStream stream = assets.open("test/" + _filename);
                 inis.put(_filename, Utils.convertIniToJson(stream));
                 stream.close();
             } catch (Exception e) {
@@ -73,7 +74,7 @@ public class Skin {
 
         for (String filename : filenames) {
             try {
-                InputStream stream = assets.open("classic/" + filename);
+                InputStream stream = assets.open("test/" + filename);
                 Bitmap bitmap = BitmapFactory.decodeStream(stream);
                 BitmapDrawable drawable = new BitmapDrawable(bitmap);
                 skin.put(filename, drawable);
@@ -82,6 +83,37 @@ public class Skin {
                 Log.e("EVA", "Cannot load " + filename + " from assets");
             }
         }
+    }
+
+    public void load (String dir) {
+        Log.d(TAG, "load() called with: dir = [" + dir + "]");
+        skin.clear();
+        for (String _filename : ini_filenames) {
+            Log.d(TAG, String.format ("ini: %s", dir + "/" + _filename));
+            try {
+                InputStream stream = new FileInputStream(dir + "/" + _filename);
+                inis.put(_filename, Utils.convertIniToJson(stream));
+                stream.close();
+            } catch (Exception e) {
+                Log.e(TAG, "load: ", e);
+            }
+        }
+
+        for (String filename : filenames) {
+            Log.d(TAG, String.format ("bitmap: %s", dir + "/" + filename));
+            try {
+                InputStream stream = new FileInputStream(dir + "/" + filename);
+                Bitmap bitmap = BitmapFactory.decodeStream(stream);
+                BitmapDrawable drawable = new BitmapDrawable(bitmap);
+                skin.put(filename, drawable);
+                stream.close();
+            } catch (Exception e) {
+                // TODO: use resources instead
+                Log.e("EVA", "Cannot load " + filename + " from assets");
+            }
+        }
+
+        states = new HashMap<>();
     }
 
     BitmapDrawable extract (Bitmap source, int width, int height, int x, int y, float scale) {
