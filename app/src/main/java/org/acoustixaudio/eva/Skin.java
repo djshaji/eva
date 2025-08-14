@@ -19,19 +19,19 @@ public class Skin {
     private static final String TAG = "EVA";
     MainActivity mainActivity ;
     AssetManager assets ;
+    String defaultSkinDir = "classic/";
     float scale = 1.0f;
     DisplayMetrics metrics ;
     HashMap <String, JSONObject> inis = new HashMap<>();
     HashMap <String, BitmapDrawable> skin = new HashMap<>();
     HashMap <String, HashMap<Integer, Bitmap>> states ;
     String [] ini_filenames = {
-            "region.txt",
-            "viscolor.txt",
+//            "region.txt",
+//            "viscolor.txt",
             "pledit.txt"
     };
 
     String [] filenames = {
-            "main_window.jpg",
         "balance.bmp",
         "eqmain.bmp",
         "main.bmp",
@@ -39,13 +39,13 @@ public class Skin {
         "posbar.bmp",
         "titlebar.bmp",
         "cbuttons.bmp",
-        "gen.bmp",
-        "mb.bmp",
+//        "gen.bmp",
+//        "mb.bmp",
         "playpaus.bmp",
         "shufrep.bmp",
-        "video.bmp",
-        "eq_ex.bmp",
-        "genex.bmp",
+//        "video.bmp",
+//        "eq_ex.bmp",
+//        "genex.bmp",
         "monoster.bmp",
         "pledit.bmp",
         "text.bmp",
@@ -61,10 +61,11 @@ public class Skin {
     }
 
     public void reset () {
+        Log.d(TAG, "reset() called");
         skin.clear();
         for (String _filename : ini_filenames) {
             try {
-                InputStream stream = assets.open("test/" + _filename);
+                InputStream stream = assets.open(defaultSkinDir + _filename);
                 inis.put(_filename, Utils.convertIniToJson(stream));
                 stream.close();
             } catch (Exception e) {
@@ -74,7 +75,7 @@ public class Skin {
 
         for (String filename : filenames) {
             try {
-                InputStream stream = assets.open("test/" + filename);
+                InputStream stream = assets.open(defaultSkinDir + filename);
                 Bitmap bitmap = BitmapFactory.decodeStream(stream);
                 BitmapDrawable drawable = new BitmapDrawable(bitmap);
                 skin.put(filename, drawable);
@@ -96,6 +97,8 @@ public class Skin {
                 stream.close();
             } catch (Exception e) {
                 Log.e(TAG, "load: ", e);
+                load();
+                return;
             }
         }
 
@@ -110,6 +113,8 @@ public class Skin {
             } catch (Exception e) {
                 // TODO: use resources instead
                 Log.e("EVA", "Cannot load " + filename + " from assets");
+                load();
+                return;
             }
         }
 

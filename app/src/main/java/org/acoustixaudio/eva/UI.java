@@ -16,6 +16,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.BlendMode;
 import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.drawable.BitmapDrawable;
@@ -290,7 +291,25 @@ public class UI {
         recyclerView.setLayoutParams(params);
         mainActivity.root.addView(recyclerView);
 
-        skin();
+        try {
+            skin();
+        } catch (Exception e) {
+            Log.e(TAG, "create: failed to load user skin", e);
+            mainActivity.skin.load();
+            skin ();
+        }
+
+        volume.setMax(100);
+        volume.setMin(0);
+        balance.setMax(100);
+        balance.setMin(-100);
+        posbar.setMax(100);
+        posbar.setMin(0);
+
+        volume.setProgress(100);
+        balance.setProgress(50);
+        posbar.setThumbTintBlendMode(BlendMode.CLEAR);
+        posbar.setProgress(0);
     }
 
     UI (MainActivity _mainActivity) {
@@ -375,12 +394,18 @@ public class UI {
         if (component.has("source_rect")) {
             JSONArray source_rect = component.getJSONArray("source_rect");
             Bitmap scaledBitmap = getCroppedScaledBitmap(bitmap, source_rect);
-            if (rotated) {
-                Matrix matrix = new Matrix();
-                matrix.postRotate(90);
-                scaledBitmap = Bitmap.createBitmap(scaledBitmap, 0, 0, scaledBitmap.getWidth(), scaledBitmap.getHeight(), matrix, true);
+            if (scaledBitmap == null) {
+                view.setBackgroundColor(mainActivity.getResources().getColor(android.R.color.transparent));
+            } else {
+
+                if (rotated) {
+                    Matrix matrix = new Matrix();
+                    matrix.postRotate(90);
+                    scaledBitmap = Bitmap.createBitmap(scaledBitmap, 0, 0, scaledBitmap.getWidth(), scaledBitmap.getHeight(), matrix, true);
+                }
+
+                view.setBackground(new android.graphics.drawable.BitmapDrawable(mainActivity.getResources(), scaledBitmap));
             }
-            view.setBackground(new android.graphics.drawable.BitmapDrawable(mainActivity.getResources(), scaledBitmap));
 
             if (view instanceof ToggleButton) {
                 HashMap <Integer, Bitmap> states = new HashMap<>();
@@ -433,6 +458,7 @@ public class UI {
                 } catch (Exception e) {
 //                    throw new RuntimeException(e);
                     Log.e(TAG, "paintView: the skin doesnt have thumb it seems", e);
+                    seekBar.setThumb(null);
                 }
 
                 if (component.has("bg") && component.getBoolean("bg")) {
@@ -512,13 +538,19 @@ public class UI {
             width = bitmap.getWidth() - x;
         if (y + height > bitmap.getHeight())
             height = bitmap.getHeight() - y;
-        Bitmap croppedBitmap = Bitmap.createBitmap(bitmap, x, y, width, height, null, true);
-        width = (int) (width * mainActivity.skin.scale);
-        height = (int) (height * mainActivity.skin.scale);
+
+        Bitmap croppedBitmap = null ;
+        try {
+            croppedBitmap = Bitmap.createBitmap(bitmap, x, y, width, height, null, true);
+            width = (int) (width * mainActivity.skin.scale);
+            height = (int) (height * mainActivity.skin.scale);
+        } catch (Exception e) {
+            Log.e(TAG, "getCroppedScaledBitmap: ", e);
+            return null ;
+        }
 
         Bitmap scaledBitmap = Bitmap.createScaledBitmap(croppedBitmap, (int) (width), (int)(height), true);
         return scaledBitmap;
     }
-
 
 }

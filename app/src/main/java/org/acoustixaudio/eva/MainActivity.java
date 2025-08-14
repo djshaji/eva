@@ -137,9 +137,17 @@ public class MainActivity extends AppCompatActivity {
                             skin.load(skinDir);
                             try {
                                 ui.skin();
-                            } catch (JSONException e) {
-                                throw new RuntimeException(e);
-                            }                        }
+                            } catch (Exception e) {
+                                Log.e(TAG, "run: failed to load skin", e);
+                                Toast.makeText(MainActivity.this, "Failed to load skin", Toast.LENGTH_SHORT).show();
+                                skin.load();
+                                try {
+                                    ui.skin();
+                                } catch (JSONException ex) {
+                                    throw new RuntimeException(ex);
+                                }
+                            }
+                        }
                     });
                 }
             }
@@ -174,8 +182,9 @@ public class MainActivity extends AppCompatActivity {
 //            if (!destDir.exists()) destDir.mkdirs();
 
             while ((zipEntry = zipInputStream.getNextEntry()) != null) {
-                String entryName = zipEntry.getName();
-                File newFile = new File(destDir, entryName);
+                String entryName = zipEntry.getName().toLowerCase();
+                Log.d(TAG, "handleSendZip: extract file " + entryName);
+                File newFile = new File(destDir, new File(entryName).getName());
                 if (zipEntry.isDirectory()) {
                     newFile.mkdirs();
                 } else {

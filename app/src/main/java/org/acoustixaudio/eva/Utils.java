@@ -170,6 +170,7 @@ public class Utils {
             // Opens input stream from the HTTP connection
             InputStream inputStream = httpConn.getInputStream();
             String saveFilePath = saveDir + File.separator + fileName;
+            Log.d(TAG, String.format ("[extract]: %s", saveFilePath));
 
             // Opens an output stream to save into file
             FileOutputStream outputStream = new FileOutputStream(saveFilePath);
