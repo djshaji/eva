@@ -2,8 +2,31 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
         android:id="@+id/shaji_menu"
-        android:title="Shaji's Music"/>
+        android:title="Shaji's Music">
+        <menu>
+            <item
+                android:id="@+id/no_dest"
+                android:title="No Destination"/>
+            <item
+                android:id="@+id/gtit"
+                android:title="Give Time It's Time"
+                />
+            <item
+                android:id="@+id/abs_inc"
+                android:title="Abstractions Inconclusive"/>
+        </menu>
+    </item>
     <item
         android:id="@+id/skin_menu"
-        android:title="Skin"/>
+        android:title="Skin">
+        <menu>
+            <item
+                android:id="@+id/load_from_file_item"
+                android:title="Load from file"/>
+            <item
+                android:id="@+id/load_default_item"
+                android:title="Load default"/>
+        </menu>
+
+    </item>
 </menu>

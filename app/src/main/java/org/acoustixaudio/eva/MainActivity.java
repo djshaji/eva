@@ -3,6 +3,8 @@ package org.acoustixaudio.eva;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.webkit.WebView;
 import android.webkit.WebResourceRequest;
@@ -10,9 +12,11 @@ import android.webkit.WebSettings;
 import android.webkit.WebResourceResponse;
 import android.webkit.WebViewClient;
 import android.widget.Button;
+import android.widget.PopupMenu;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.app.ActivityCompat;
@@ -43,6 +47,7 @@ public class MainActivity extends AppCompatActivity {
     public ConstraintLayout root;
     Utils utils = new Utils(this);
     WebView webView ;
+    private PopupMenu popup;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,6 +57,7 @@ public class MainActivity extends AppCompatActivity {
         skin = new Skin(this);
         skinDir = getFilesDir().getAbsolutePath() + "/skin/";
         ui = new UI(this);
+
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
         root = findViewById(R.id.root);
@@ -108,12 +114,49 @@ public class MainActivity extends AppCompatActivity {
         ui.logoBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                openFilePicker();
+//                openFilePicker();
+                popupMenu();
             }
         });
 
         root.addView(webView, lparams);
         webView.setVisibility(View.GONE);
+
+        popup = new PopupMenu(this, ui.logoBtn);
+        popup.getMenuInflater().inflate(R.menu.main, popup.getMenu());
+        popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem menuItem) {
+                switch (menuItem.getItemId()) {
+                    default:
+                        Log.d(TAG, String.format ("[menu]: %d", menuItem.getItemId()));
+                        return false;
+                }
+
+            }
+        });
+
+        MenuItem loadFromFile = popup.getMenu().findItem(R.id.load_from_file_item);
+        loadFromFile.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(@NonNull MenuItem menuItem) {
+                openFilePicker();
+                return false;
+            }
+        });
+
+        popup.getMenu().findItem(R.id.load_default_item).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(@NonNull MenuItem menuItem) {
+                skin.load();
+                try {
+                    ui.skin();
+                } catch (JSONException e) {
+                    throw new RuntimeException(e);
+                }
+                return false;
+            }
+        });
     }
 
     private void openFilePicker() {
@@ -243,5 +286,9 @@ public class MainActivity extends AppCompatActivity {
         });
         webView.loadUrl(url);
         return link;
+    }
+
+    void popupMenu () {
+        popup.show();
     }
 }
