@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/pl_load"
+        android:title="Load playlist"/>
+    <item
+        android:id="@+id/pl_save"
+        android:title="Save playlist"/>
+</menu>

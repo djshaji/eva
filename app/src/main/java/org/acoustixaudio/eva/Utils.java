@@ -1,6 +1,7 @@
 package org.acoustixaudio.eva;
 
 import android.content.res.Resources;
+import android.net.Uri;
 import android.util.Log;
 
 import org.json.JSONException;
@@ -9,11 +10,14 @@ import org.json.JSONObject;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.regex.Matcher;
@@ -192,4 +196,27 @@ public class Utils {
         }
     }
 
+    public static void writeToFile(List<Song> playlist, String filePath) throws IOException {
+        StringBuilder content = new StringBuilder();
+        for (Song line : playlist) {
+            content.append(line.getUri()).append("\n");
+        }
+
+        File file = new File(filePath);
+        FileOutputStream fileOutputStream = new FileOutputStream(file);
+        fileOutputStream.write(content.toString().getBytes());
+        fileOutputStream.close();
+    }
+
+    public static ArrayList<String> readLinesFromFile(String filePath) throws IOException {
+        File file = new File(new File(filePath).getAbsolutePath());
+        BufferedReader reader = new BufferedReader(new FileReader(file));
+        ArrayList <String> lines = new ArrayList<>();
+        String line;
+        while ((line = reader.readLine()) != null) {
+            lines.add(line);
+        }
+        reader.close();
+        return lines;
+    }
 }

@@ -11,7 +11,10 @@ import java.io.File;
 import java.io.FileOutputStream;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.view.ActionMode;
 import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.media3.exoplayer.ExoPlayer;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.graphics.Bitmap;
@@ -21,7 +24,10 @@ import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AbsoluteLayout;
 import android.widget.Button;
@@ -29,11 +35,14 @@ import android.widget.CompoundButton;
 import android.widget.GridLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.PopupMenu;
 import android.widget.SeekBar;
+import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Objects;
 import java.util.Random;
 
@@ -44,7 +53,13 @@ public class UI {
     ImageView mainWindow = null, equalizer ;
     ToggleButton toggle_eq ;
     JSONObject skinFormat = null ;
+
     RecyclerView recyclerView ;
+    public PlaylistAdapter playlistAdapter ;
+    private List<Song> songsList = new ArrayList<>();
+    private ActionMode actionMode;
+    private ActionMode.Callback actionModeCallback;
+
     ArrayList <SeekBar> eq_slider_list = new ArrayList<>();
     ArrayList <ImageView> pl_title_list = new ArrayList<>();
     ArrayList <ImageView> pl_border_left_list = new ArrayList<>();
@@ -75,6 +90,9 @@ public class UI {
     private ImageView pl_bleft;
     private ImageView pl_bright;
     public Button logoBtn;
+
+    public Button plAdd, plRemove, plSelect, plLoad, plMisc;
+    private String defaultPlaylist;
 
     public void skin () throws JSONException {
         Log.d(TAG, "skin() called");
@@ -140,6 +158,7 @@ public class UI {
     }
 
     public void create () throws JSONException {
+        defaultPlaylist = mainActivity.getFilesDir().getAbsolutePath() + "/playlist.m3u";
         mainWindow = (ImageView) createView(skinFormat.getJSONObject("main_window").getJSONObject("background"));
         mainActivity.root.addView(mainWindow);
 
@@ -249,6 +268,40 @@ public class UI {
         recyclerView.setLayoutParams(params);
         mainActivity.root.addView(recyclerView);
 
+        recyclerView.setLayoutManager(new LinearLayoutManager(mainActivity));
+
+        playlistAdapter = new PlaylistAdapter(songsList,
+                new PlaylistAdapter.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(Song song, int position) {
+                        // Handle single tap: Play the song
+                        playSong(song);
+                        // If you want to clear selection on play, do it here:
+                        if (actionMode != null) {
+                            actionMode.finish(); // This will also call clearSelection in onDestroyActionMode
+                        } else {
+                            // If not in action mode, but want to clear any stray selection (less common scenario)
+                            playlistAdapter.clearSelection();
+                        }
+                    }
+                },
+                new PlaylistAdapter.OnItemLongClickListener() {
+                    @Override
+                    public void onItemLongClick(Song song, int position) {
+                        // Long press initiates multi-select mode or adds to selection
+//                        if (actionMode == null) {
+//                            actionMode = startSupportActionMode(actionModeCallback);
+//                        }
+                        // The adapter's long click listener already handles toggling selection
+                        // You might want to update the ActionMode title here if needed
+                        if (actionMode != null) {
+                            actionMode.setTitle(playlistAdapter.getSelectedSongs().size() + " selected");
+                        }
+                    }
+                }
+        );
+        recyclerView.setAdapter(playlistAdapter);
+
         int height = (int) (mainActivity.skin.metrics.heightPixels / mainActivity.skin.scale) - statusBar - 38;
         int right = (int) (mainActivity.skin.metrics.widthPixels / mainActivity.skin.scale) - 25;
         for (int i = 232 ; i < height ; i++) {
@@ -310,6 +363,95 @@ public class UI {
         balance.setProgress(50);
         posbar.setThumbTintBlendMode(BlendMode.CLEAR);
         posbar.setProgress(0);
+
+        plAdd = new Button(mainActivity);
+        plAdd.setBackgroundColor(mainActivity.getResources().getColor(android.R.color.transparent));
+        add (plAdd, 28, 25, 10, (int) (mainActivity.skin.metrics.heightPixels / mainActivity.skin.scale) - 86);
+
+        plRemove = new Button(mainActivity);
+        plRemove.setBackgroundColor(mainActivity.getResources().getColor(android.R.color.transparent));
+        add (plRemove, 28, 25, 40, (int) (mainActivity.skin.metrics.heightPixels / mainActivity.skin.scale) - 86);
+
+        plSelect = new Button(mainActivity);
+        plSelect.setBackgroundColor(mainActivity.getResources().getColor(android.R.color.transparent));
+        add (plSelect, 28, 25, 70, (int) (mainActivity.skin.metrics.heightPixels / mainActivity.skin.scale) - 86);
+
+        plMisc = new Button(mainActivity);
+        plMisc.setBackgroundColor(mainActivity.getResources().getColor(android.R.color.transparent));
+        add (plMisc, 28, 25, 100, (int) (mainActivity.skin.metrics.heightPixels / mainActivity.skin.scale) - 86);
+
+        plLoad = new Button(mainActivity);
+        plLoad.setBackgroundColor(mainActivity.getResources().getColor(android.R.color.transparent));
+        add (plLoad, 28, 25, (int) (mainActivity.skin.metrics.widthPixels / mainActivity.skin.scale) - 46, (int) (mainActivity.skin.metrics.heightPixels / mainActivity.skin.scale) - 86);
+
+        playlistMenus();
+    }
+
+    void playlistMenus () {
+        PopupMenu mAdd = new PopupMenu(mainActivity, plAdd);
+        mAdd.getMenuInflater().inflate(R.menu.add, mAdd.getMenu());
+        plAdd.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mAdd.show();
+            }
+        });
+
+        PopupMenu mRemove = new PopupMenu(mainActivity, plRemove);
+        mRemove.getMenuInflater().inflate(R.menu.remove, mRemove.getMenu());
+
+        plRemove.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mRemove.show();
+            }
+        });
+
+        PopupMenu mSelect = new PopupMenu(mainActivity, plSelect);
+        mSelect.getMenuInflater().inflate(R.menu.select, mSelect.getMenu());
+
+        plSelect.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mSelect.show();
+            }
+        });
+
+        PopupMenu mMisc = new PopupMenu(mainActivity, plMisc);
+        mMisc.getMenuInflater().inflate(R.menu.misc, mMisc.getMenu());
+
+        plMisc.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mMisc.show();
+            }
+        });
+
+        PopupMenu mLoad = new PopupMenu(mainActivity, plLoad);
+        mLoad.getMenuInflater().inflate(R.menu.load_pl, mLoad.getMenu());
+
+        plLoad.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mLoad.show();
+            }
+        });
+
+        mAdd.getMenu().findItem(R.id.pl_add_file).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(@NonNull MenuItem menuItem) {
+                mainActivity.openFilePicker(MainActivity.AUDIO_FILE_REQUEST_CODE);
+                return false;
+            }
+        });
+    }
+
+    void add (View view, int w, int h, int x, int y) {
+        float scale = mainActivity.skin.scale;
+        view.setLayoutParams(new ConstraintLayout.LayoutParams((int) (w * scale), (int) (h * scale)));
+        view.setX(x * scale);
+        view.setY(y * scale);
+        mainActivity.root.addView(view);
     }
 
     UI (MainActivity _mainActivity) {
@@ -404,7 +546,7 @@ public class UI {
                     scaledBitmap = Bitmap.createBitmap(scaledBitmap, 0, 0, scaledBitmap.getWidth(), scaledBitmap.getHeight(), matrix, true);
                 }
 
-                view.setBackground(new android.graphics.drawable.BitmapDrawable(mainActivity.getResources(), scaledBitmap));
+                view.setBackground(new BitmapDrawable(mainActivity.getResources(), scaledBitmap));
             }
 
             if (view instanceof ToggleButton) {
@@ -553,4 +695,58 @@ public class UI {
         return scaledBitmap;
     }
 
+    private void playSong(Song song) {
+        // ... your logic to start playing the selected song
+        Toast.makeText(mainActivity, "Playing: " + song.getTitle(), Toast.LENGTH_SHORT).show();
+        mainActivity.player.play(song.getUri());
+    }
+
+    public void addToPlaylist (Uri uri) {
+        Log.i(TAG, "addToPlaylist() called with: uri = [" + uri + "]");
+//        Song song = new Song(uri);
+        Song song = new Song(uri);
+
+        songsList.add(song);
+        playlistAdapter.notifyItemInserted(songsList.size() - 1);
+        saveCurrentPlaylist();
+    }
+
+    public void savePlaylist (String filename) {
+        try {
+            Utils.writeToFile(songsList, filename);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void saveCurrentPlaylist () {
+        savePlaylist(defaultPlaylist);
+    }
+
+    public void loadCurrentPlaylist () {
+        loadPlaylist(defaultPlaylist);
+    }
+
+    public void loadPlaylist (String filename) {
+        ArrayList<String> list = new ArrayList<>();
+        try {
+            list = Utils.readLinesFromFile(filename);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        songsList.clear();
+        for (String uri : list) {
+            addToPlaylist(Uri.parse(uri));
+        }
+
+        playlistAdapter.notifyDataSetChanged();
+        saveCurrentPlaylist();
+    }
+
+    public void clearPlaylist () {
+        songsList.clear();
+        playlistAdapter.notifyDataSetChanged();
+        saveCurrentPlaylist();
+    }
 }

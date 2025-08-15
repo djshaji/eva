@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/pl_remove_selected"
+        android:title="Remove selected"/>
+    <item
+        android:id="@+id/pl_remove_unselected"
+        android:title="Remove unselected"/>
+    <item
+        android:id="@+id/pl_remove_all"
+        android:title="Remove All"/>
+</menu>

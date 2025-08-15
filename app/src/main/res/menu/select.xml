@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/select_all"
+        android:title="Select all"/>
+    <item
+        android:id="@+id/unselect_all"
+        android:title="Select None"/>
+    <item
+        android:id="@+id/select_invert"
+        android:title="Invert Selection"/>
+</menu>

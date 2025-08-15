@@ -43,11 +43,13 @@ public class MainActivity extends AppCompatActivity {
     String skinDir = null ;
     org.acoustixaudio.eva.UI ui;
     private static final int FILE_PICKER_REQUEST_CODE = 123;
+    public static final int AUDIO_FILE_REQUEST_CODE = 124;
 
     public ConstraintLayout root;
     Utils utils = new Utils(this);
     WebView webView ;
     private PopupMenu popup;
+    public Player player;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,6 +60,7 @@ public class MainActivity extends AppCompatActivity {
         skinDir = getFilesDir().getAbsolutePath() + "/skin/";
         ui = new UI(this);
 
+        player = new Player (this);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
         root = findViewById(R.id.root);
@@ -140,7 +143,7 @@ public class MainActivity extends AppCompatActivity {
         loadFromFile.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(@NonNull MenuItem menuItem) {
-                openFilePicker();
+                openFilePicker(FILE_PICKER_REQUEST_CODE);
                 return false;
             }
         });
@@ -157,13 +160,15 @@ public class MainActivity extends AppCompatActivity {
                 return false;
             }
         });
+
+        ui.loadCurrentPlaylist();
     }
 
-    private void openFilePicker() {
+    public void openFilePicker(int requestCode) {
         Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
         intent.addCategory(Intent.CATEGORY_OPENABLE);
         intent.setType("*/*"); // Filter for zip files
-        startActivityForResult(intent, FILE_PICKER_REQUEST_CODE);
+        startActivityForResult(intent, requestCode);
     }
 
     @Override
@@ -195,7 +200,15 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         }
+
+        if (requestCode == AUDIO_FILE_REQUEST_CODE && resultCode == RESULT_OK) {
+            Uri uri = data.getData();
+            ui.addToPlaylist(uri);
+            getContentResolver().takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            return;
+        }
     }
+
     String getFileFromAsset(String filename) {
         String json = null;
         try {

@@ -29,6 +29,7 @@ android {
 }
 
 dependencies {
+    implementation "androidx.media3:media3-exoplayer:1.8.0"
 
     implementation libs.appcompat
     implementation libs.material
