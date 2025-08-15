@@ -234,6 +234,21 @@ public class UI {
         int statusBar = (int) ((int) Utils.getStatusBarHeight(mainActivity.getResources()) / mainActivity.skin.scale) + 20; // for some reason bottom of playlist is cut off
         JSONObject bleft = skinFormat.getJSONObject("playlist").getJSONObject("titlebar").getJSONObject("bleft");
 
+        recyclerView = new RecyclerView(mainActivity);
+        int rw = (int) (250 * mainActivity.skin.scale);
+        int rh = (int) (mainActivity.skin.metrics.heightPixels - ((statusBar + 116 + 30 + 140) * mainActivity.skin.scale));
+        int marginLeft = 12;
+        marginLeft = (int) (marginLeft * mainActivity.skin.scale) ;
+        int marginTop = 252;
+        marginTop = (int) (marginTop * mainActivity.skin.scale) ;
+
+        ConstraintLayout.LayoutParams params = new ConstraintLayout.LayoutParams(rw, rh);
+        params.setMargins(marginLeft, marginTop, 0, 0);
+        params.topToTop = ConstraintLayout.LayoutParams.PARENT_ID;
+        params.startToStart = ConstraintLayout.LayoutParams.PARENT_ID;
+        recyclerView.setLayoutParams(params);
+        mainActivity.root.addView(recyclerView);
+
         int height = (int) (mainActivity.skin.metrics.heightPixels / mainActivity.skin.scale) - statusBar - 38;
         int right = (int) (mainActivity.skin.metrics.widthPixels / mainActivity.skin.scale) - 25;
         for (int i = 232 ; i < height ; i++) {
@@ -275,21 +290,6 @@ public class UI {
         mainActivity.root.addView(pl_bleft);
         pl_bright = (ImageView) createView(blr);
         mainActivity.root.addView(pl_bright);
-
-        recyclerView = new RecyclerView(mainActivity);
-        int rw = (int) (250 * mainActivity.skin.scale);
-        int rh = (int) (mainActivity.skin.metrics.heightPixels - ((statusBar + 116 + 38 + 140) * mainActivity.skin.scale));
-        int marginLeft = 12;
-        marginLeft = (int) (marginLeft * mainActivity.skin.scale) ;
-        int marginTop = 252;
-        marginTop = (int) (marginTop * mainActivity.skin.scale) ;
-
-        ConstraintLayout.LayoutParams params = new ConstraintLayout.LayoutParams(rw, rh);
-        params.setMargins(marginLeft, marginTop, 0, 0);
-        params.topToTop = ConstraintLayout.LayoutParams.PARENT_ID;
-        params.startToStart = ConstraintLayout.LayoutParams.PARENT_ID;
-        recyclerView.setLayoutParams(params);
-        mainActivity.root.addView(recyclerView);
 
         try {
             skin();
