@@ -13,6 +13,8 @@ import java.io.FileOutputStream;
 import androidx.annotation.NonNull;
 import androidx.appcompat.view.ActionMode;
 import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.media3.common.Player;
+import androidx.media3.common.Tracks;
 import androidx.media3.exoplayer.ExoPlayer;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -25,6 +27,7 @@ import android.graphics.Matrix;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.os.Handler;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -93,6 +96,8 @@ public class UI {
 
     public Button plAdd, plRemove, plSelect, plLoad, plMisc;
     private String defaultPlaylist;
+    private Handler handler;
+    private Runnable runnable;
 
     public void skin () throws JSONException {
         Log.d(TAG, "skin() called");
@@ -158,6 +163,8 @@ public class UI {
     }
 
     public void create () throws JSONException {
+        handler = new Handler();
+        
         defaultPlaylist = mainActivity.getFilesDir().getAbsolutePath() + "/playlist.m3u";
         mainWindow = (ImageView) createView(skinFormat.getJSONObject("main_window").getJSONObject("background"));
         mainActivity.root.addView(mainWindow);
@@ -384,6 +391,7 @@ public class UI {
         plLoad.setBackgroundColor(mainActivity.getResources().getColor(android.R.color.transparent));
         add (plLoad, 28, 25, (int) (mainActivity.skin.metrics.widthPixels / mainActivity.skin.scale) - 46, (int) (mainActivity.skin.metrics.heightPixels / mainActivity.skin.scale) - 86);
 
+        registerButtons();
         playlistMenus();
     }
 
@@ -441,6 +449,21 @@ public class UI {
             @Override
             public boolean onMenuItemClick(@NonNull MenuItem menuItem) {
                 mainActivity.openFilePicker(MainActivity.AUDIO_FILE_REQUEST_CODE);
+                return false;
+            }
+        });
+
+        mAdd.getMenu().findItem(R.id.pl_add_folder).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(@NonNull MenuItem menuItem) {
+                mainActivity.openFilePicker(MainActivity.AUDIO_FOLDER_REQUEST_CODE);
+                return false;
+            }
+        });
+        mRemove.getMenu().findItem(R.id.pl_remove_all).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(@NonNull MenuItem menuItem) {
+                clearPlaylist();
                 return false;
             }
         });
@@ -751,5 +774,88 @@ public class UI {
         songsList.clear();
         playlistAdapter.notifyDataSetChanged();
         saveCurrentPlaylist();
+    }
+
+    void registerButtons () {
+        play.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                playbackStart();
+            }
+        });
+
+        pause.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mainActivity.player.player.pause();
+            }
+        });
+
+        stop.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mainActivity.player.player.stop();
+            }
+        });
+
+        mainActivity.player.player.addListener(new Player.Listener() {
+            @Override
+            public void onEvents(Player player, Player.Events events) {
+                Player.Listener.super.onEvents(player, events);
+            }
+
+            @Override
+            public void onTracksChanged(Tracks tracks) {
+                Player.Listener.super.onTracksChanged(tracks);
+            }
+
+            @Override
+            public void onPlaybackStateChanged(int playbackState) {
+                Player.Listener.super.onPlaybackStateChanged(playbackState);
+                Log.d(TAG, String.format ("[playback state]: %d", playbackState));
+
+                if (playbackState == Player.STATE_READY) {
+                    updatePosBar();
+                    posbar.setVisibility(View.VISIBLE);
+                } else {
+                    handler.removeCallbacks(runnable);
+                }
+
+                if (playbackState == Player.STATE_ENDED || playbackState == Player.STATE_IDLE) {
+                    posbar.setVisibility(View.GONE);
+                    Log.d(TAG, "onPlaybackStateChanged: stopping");
+                }
+            }
+        });
+    }
+
+    public void playbackStart () {
+        if (mainActivity.player.player.isPlaying()) {
+            Log.d(TAG, String.format ("isPlaying: true"));
+            mainActivity.player.player.seekTo(0);
+        }
+        else {
+            if (mainActivity.player.player.getCurrentMediaItem() == null) {
+                Log.d(TAG, String.format ("[playback]: no media"));
+                mainActivity.player.play(songsList.get(0).getUri());
+            } else {
+                Log.d(TAG, "playbackStart: probably paused");
+                mainActivity.player.player.play();
+            }
+        }
+
+
+    }
+
+    void updatePosBar () {
+        runnable = new Runnable() {
+            @Override
+            public void run() {
+                posbar.setProgress((int) ((mainActivity.player.player.getCurrentPosition()*100)/mainActivity.player.player.getDuration()));
+                handler.postDelayed(runnable, 1000);
+            }
+        };
+
+        handler.postDelayed(runnable, 0);
     }
 }

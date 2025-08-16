@@ -27,11 +27,14 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import org.json.JSONException;
+import androidx.documentfile.provider.DocumentFile;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -46,6 +49,7 @@ public class MainActivity extends AppCompatActivity {
     org.acoustixaudio.eva.UI ui;
     private static final int FILE_PICKER_REQUEST_CODE = 123;
     public static final int AUDIO_FILE_REQUEST_CODE = 124;
+    public static final int AUDIO_FOLDER_REQUEST_CODE = 125;
 
     public ConstraintLayout root;
     Utils utils = new Utils(this);
@@ -168,9 +172,18 @@ public class MainActivity extends AppCompatActivity {
 
     public void openFilePicker(int requestCode) {
         Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
-        intent.addCategory(Intent.CATEGORY_OPENABLE);
-        intent.setType("*/*"); // Filter for zip files
-        startActivityForResult(intent, requestCode);
+        if (requestCode == AUDIO_FOLDER_REQUEST_CODE) {
+            intent = new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
+        } else {
+            intent.addCategory(Intent.CATEGORY_OPENABLE);
+            intent.setType("*/*"); // Filter for zip files
+        }
+        try {
+            startActivityForResult(intent, requestCode);
+        } catch (Exception e) {
+            Log.e(TAG, "openFilePicker: ", e);
+            Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
+        }
     }
 
     @Override
@@ -208,6 +221,24 @@ public class MainActivity extends AppCompatActivity {
             String filename = getFileNameFromUri(uri);
             ui.addToPlaylist(uri);
             getContentResolver().takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            return;
+        }
+
+        if (requestCode == AUDIO_FOLDER_REQUEST_CODE && resultCode == RESULT_OK) {
+            Uri uri = data.getData();
+            getContentResolver().takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            // Assuming 'uri' is the URI of the selected folder
+            DocumentFile documentFile = DocumentFile.fromTreeUri(this, uri);
+            if (documentFile != null && documentFile.isDirectory()) {
+                DocumentFile[] files = documentFile.listFiles();
+                for (DocumentFile file : files) {
+                    if (file.isFile()) {
+                        // Handle each file, e.g., add to playlist
+                        Log.d(TAG, "onActivityResult: File in folder: " + file.getName() + " URI: " + file.getUri());
+                        ui.addToPlaylist(file.getUri());
+                    }
+                }
+            }
             return;
         }
     }
@@ -330,5 +361,29 @@ public class MainActivity extends AppCompatActivity {
             result = uri.getLastPathSegment();
         }
         return result;
+    }
+
+    public List<File> getFilesFromFolder(String directoryPath) {
+        List<File> fileList = new ArrayList<>();
+        File directory = new File(directoryPath);
+
+        if (directory.exists() && directory.isDirectory()) {
+            File[] files = directory.listFiles();
+            if (files != null) {
+                for (File file : files) {
+                    if (file.isFile()) { // Check if it's a file (not a subdirectory)
+                        fileList.add(file);
+                    }
+                    // If you also want to list files in subdirectories recursively:
+                    // else if (file.isDirectory()) {
+                    //     fileList.addAll(getFilesFromFolder(file.getAbsolutePath()));
+                    // }
+                }
+            }
+        } else {
+            // Handle the case where the directory doesn't exist or is not a directory
+            Log.e("FileUtils", "Directory not found or is not a directory: " + directoryPath);
+        }
+        return fileList;
     }
 }
