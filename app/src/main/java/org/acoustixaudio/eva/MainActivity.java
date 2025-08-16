@@ -9,6 +9,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.webkit.WebView;
+import android.widget.EditText;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebSettings;
 import android.webkit.WebResourceResponse;
@@ -19,6 +20,7 @@ import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.app.ActivityCompat;
@@ -30,9 +32,11 @@ import org.json.JSONException;
 import androidx.documentfile.provider.DocumentFile;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.zip.ZipEntry;
@@ -50,18 +54,23 @@ public class MainActivity extends AppCompatActivity {
     private static final int FILE_PICKER_REQUEST_CODE = 123;
     public static final int AUDIO_FILE_REQUEST_CODE = 124;
     public static final int AUDIO_FOLDER_REQUEST_CODE = 125;
+    public static final int SAVE_PLAYLIST_REQUEST_CODE = 126;
+    public static final int LOAD_PLAYLIST_REQUEST_CODE = 127;
 
     public ConstraintLayout root;
     Utils utils = new Utils(this);
-    WebView webView ;
+//    WebView webView ;
     private PopupMenu popup;
     public Player player;
+    private String playlistDir;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        webView = new WebView(this);
+//        webView = new WebView(this);
 
+        playlistDir = getFilesDir().getAbsolutePath() + "/playlists/";
+        new File (playlistDir).mkdirs();
         skin = new Skin(this);
         skinDir = getFilesDir().getAbsolutePath() + "/skin/";
         ui = new UI(this);
@@ -96,8 +105,8 @@ public class MainActivity extends AppCompatActivity {
             }
             Log.d(TAG, String.format("[intent]: %s", zipUri));
             if (zipUri != null) {
-                String link = getSkinLink(zipUri.toString());
-                Log.d(TAG, "onCreate: got skin link " + link);
+//                String link = getSkinLink(zipUri.toString());
+//                Log.d(TAG, "onCreate: got skin link " + link);
             }
         }
 
@@ -129,8 +138,8 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        root.addView(webView, lparams);
-        webView.setVisibility(View.GONE);
+//        root.addView(webView, lparams);
+//        webView.setVisibility(View.GONE);
 
         popup = new PopupMenu(this, ui.logoBtn);
         popup.getMenuInflater().inflate(R.menu.main, popup.getMenu());
@@ -164,6 +173,8 @@ public class MainActivity extends AppCompatActivity {
                 } catch (JSONException e) {
                     throw new RuntimeException(e);
                 }
+
+                utils.deleteRecursive(new File(skinDir));
                 return false;
             }
         });
@@ -173,12 +184,18 @@ public class MainActivity extends AppCompatActivity {
 
     public void openFilePicker(int requestCode) {
         Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+        String intentType = "*/*";
         if (requestCode == AUDIO_FOLDER_REQUEST_CODE) {
             intent = new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
-        } else {
-            intent.addCategory(Intent.CATEGORY_OPENABLE);
-            intent.setType("*/*"); // Filter for zip files
+        } else if (requestCode == LOAD_PLAYLIST_REQUEST_CODE) {
+            intent.setType("application/x-eva-playlist"); // Filter for your custom playlist type
+            intent.putExtra(Intent.EXTRA_MIME_TYPES, new String[]{"application/x-eva-playlist", "audio/x-mpegurl", "audio/mpegurl"}); // Common M3U types
+        } else if (requestCode == SAVE_PLAYLIST_REQUEST_CODE) {
+            intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
+            intentType = "application/x-eva-playlist"; // Custom MIME type for playlist
         }
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
+        intent.setType(intentType);
         try {
             startActivityForResult(intent, requestCode);
         } catch (Exception e) {
@@ -242,6 +259,43 @@ public class MainActivity extends AppCompatActivity {
             }
             return;
         }
+
+        if (requestCode == SAVE_PLAYLIST_REQUEST_CODE && resultCode == RESULT_OK) {
+            if (data != null && data.getData() != null) {
+                Uri uri = data.getData();
+                try {
+                    OutputStream outputStream = getContentResolver().openOutputStream(uri);
+                    if (outputStream != null) {
+                        // TODO: Implement actual playlist saving logic here
+                        // For now, let's just write a dummy string
+                        String playlistContent = "This is a dummy playlist.";
+                        outputStream.write(playlistContent.getBytes());
+                        outputStream.close();
+                        Toast.makeText(this, "Playlist saved to " + getFileNameFromUri(uri), Toast.LENGTH_LONG).show();
+                    }
+                } catch (FileNotFoundException e) {
+                    Log.e(TAG, "File not found for saving playlist: ", e);
+                    Toast.makeText(this, "Error: File not found", Toast.LENGTH_SHORT).show();
+                } catch (IOException e) {
+                    Log.e(TAG, "Error writing playlist to file: ", e);
+                    Toast.makeText(this, "Error saving playlist", Toast.LENGTH_SHORT).show();
+                }
+            }
+        }
+
+        if (requestCode == LOAD_PLAYLIST_REQUEST_CODE && resultCode == RESULT_OK) {
+            if (data != null && data.getData() != null) {
+                Uri uri = data.getData();
+                try {
+                    ui.loadPlaylist(String.valueOf(uri));
+                    Toast.makeText(this, "Playlist loaded: " + getFileNameFromUri(uri), Toast.LENGTH_LONG).show();
+                } catch (Exception e) {
+                    Log.e(TAG, "Error loading playlist: ", e);
+                    Toast.makeText(this, "Error loading playlist", Toast.LENGTH_SHORT).show();
+                }
+            }
+            return;
+        }
     }
 
     String getFileFromAsset(String filename) {
@@ -294,6 +348,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    /*
     String getSkinLink (String url) {
         Log.d(TAG, "getSkinLink() called with: url = [" + url + "]");
         String link = null ;
@@ -336,6 +391,8 @@ public class MainActivity extends AppCompatActivity {
         return link;
     }
 
+
+     */
     void popupMenu () {
         popup.show();
     }
@@ -386,5 +443,65 @@ public class MainActivity extends AppCompatActivity {
             Log.e("FileUtils", "Directory not found or is not a directory: " + directoryPath);
         }
         return fileList;
+    }
+
+    public void savePlaylist () {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Save Playlist As");
+
+        final EditText input = new EditText(this);
+        input.setHint("playlist_name.m3u"); // .evpl or your custom extension
+        builder.setView(input);
+
+        builder.setPositiveButton("Save", (dialog, which) -> {
+            String fileName = input.getText().toString();
+            if (!fileName.isEmpty()) {
+                ui.savePlaylist(playlistDir + fileName);
+                Toast.makeText(this, "Playlist saved", Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(this, "Please enter a filename", Toast.LENGTH_SHORT).show();
+            }
+        });
+        builder.setNegativeButton("Cancel", (dialog, which) -> dialog.cancel());
+        builder.show();
+    }
+
+    void loadPlaylist () {
+        // Get the path to your app's internal storage directory for playlists
+        List<File> playlistFiles = getFilesFromFolder(playlistDir);
+        if (playlistFiles.isEmpty()) {
+            Toast.makeText(this, "No playlists found.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // Create a list of playlist names to display in the dialog
+        List<String> playlistNames = new ArrayList<>();
+        for (File file : playlistFiles) {
+            playlistNames.add(file.getName());
+        }
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Select Playlist");
+        builder.setItems(playlistNames.toArray(new String[0]), (dialog, which) -> {
+            File selectedPlaylistFile = playlistFiles.get(which);
+            ui.loadPlaylist(selectedPlaylistFile.getAbsolutePath());
+            Toast.makeText(this, "Loading " + selectedPlaylistFile.getName(), Toast.LENGTH_SHORT).show();
+        });
+        // Add a "Delete" option (optional, handle with care)
+        builder.setNeutralButton("Delete", (dialog, which) -> {
+            // This will be overridden later to show a sub-dialog for deletion
+            // For now, it does nothing or you can prompt for confirmation directly
+            showDeletePlaylistDialog(playlistFiles, playlistNames);
+        });
+        builder.setNegativeButton("Cancel", (dialog, which) -> dialog.dismiss());
+        builder.show();
+    }
+
+    private void showDeletePlaylistDialog(List<File> playlistFiles, List<String> playlistNames) {
+        new AlertDialog.Builder(this)
+                .setTitle("Delete Playlist")
+                .setItems(playlistNames.toArray(new String[0]), (dialog, which) -> ui.deletePlaylist(playlistFiles.get(which)))
+                .setNegativeButton("Cancel", (d, w) -> d.dismiss())
+                .show();
     }
 }

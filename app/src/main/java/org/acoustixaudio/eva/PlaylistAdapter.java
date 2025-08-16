@@ -25,6 +25,37 @@ public class PlaylistAdapter extends RecyclerView.Adapter<PlaylistAdapter.SongVi
     public MainActivity mainActivity ;
     private Set<Integer> selectedItems = new HashSet<>(); // Store indices of selected items
 
+    public void selectAll() {
+        for (int i = 0; i < songs.size(); i++) {
+            songs.get(i).setSelected(true);
+            selectedItems.add(i);
+        }
+        notifyDataSetChanged();
+    }
+
+    public void selectNone () {
+        for (int i = 0; i < songs.size(); i++) {
+            songs.get(i).setSelected(false);
+            selectedItems.remove(i);
+        }
+        notifyDataSetChanged();
+    }
+
+    public void invertSelection () {
+        for (int i = 0; i < songs.size(); i++) {
+            if (selectedItems.contains(i)) {
+                songs.get(i).setSelected(false);
+                selectedItems.remove(i);
+            } else {
+                songs.get(i).setSelected(true);
+                selectedItems.add(i);
+            }
+
+        }
+
+        notifyDataSetChanged();
+    }
+
     // Interfaces for click listeners
     public interface OnItemClickListener {
         void onItemClick(Song song, int position);
@@ -83,6 +114,18 @@ public class PlaylistAdapter extends RecyclerView.Adapter<PlaylistAdapter.SongVi
             if (position >= 0 && position < songs.size()) { // Boundary check
                 selectedSongsList.add(songs.get(position));
             }
+        }
+        return selectedSongsList;
+    }
+
+    public List<Song> getUnselectedSongs() {
+        List<Song> selectedSongsList = new ArrayList<>();
+        int index = 0 ;
+        for (Song position : songs) {
+            if (!selectedItems.contains(index)) {
+                selectedSongsList.add(position);
+            }
+            index ++ ;
         }
         return selectedSongsList;
     }

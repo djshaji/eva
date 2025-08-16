@@ -1,10 +1,15 @@
 package org.acoustixaudio.eva;
 
 import android.media.MediaMetadataRetriever;
+import android.media.audiofx.AudioEffect;
+import android.media.audiofx.Equalizer;
+import android.media.audiofx.LoudnessEnhancer;
 import android.net.Uri;
 import android.util.Log;
 
+import androidx.annotation.OptIn;
 import androidx.media3.common.MediaItem;
+import androidx.media3.common.util.UnstableApi;
 import androidx.media3.exoplayer.ExoPlayer;
 
 public class Player {
@@ -13,10 +18,21 @@ public class Player {
     MainActivity mainActivity;
     MediaMetadataRetriever retriever = null ;
 
-    Player (MainActivity _mainActivity) {
+    Equalizer equalizer;
+    LoudnessEnhancer loudnessEnhancer;
+
+    int [] eqBands = {60000, 170000, 310000, 600000, 1000000, 3000000, 6000000, 12000000, 14000000, 16000000};
+
+    @OptIn(markerClass = UnstableApi.class) Player (MainActivity _mainActivity) {
         mainActivity = _mainActivity;
         player = new ExoPlayer.Builder(mainActivity).build();
         retriever = new MediaMetadataRetriever();
+        AudioEffect.Descriptor[] effects = AudioEffect.queryEffects();
+        Log.d(TAG, "Supported effects:");
+        for (AudioEffect.Descriptor effect : effects) {
+            Log.d(TAG, "  " + effect.name + " (" + effect.implementor + ")");
+        }
+
     }
 
     public void play (Uri uri) {

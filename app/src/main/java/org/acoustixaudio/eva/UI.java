@@ -11,10 +11,12 @@ import java.io.File;
 import java.io.FileOutputStream;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.OptIn;
 import androidx.appcompat.view.ActionMode;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.media3.common.Player;
 import androidx.media3.common.Tracks;
+import androidx.media3.common.util.UnstableApi;
 import androidx.media3.exoplayer.ExoPlayer;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -27,6 +29,8 @@ import android.graphics.Matrix;
 import android.graphics.Typeface;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.media.audiofx.Equalizer;
+import android.media.audiofx.LoudnessEnhancer;
 import android.net.Uri;
 import android.os.Handler;
 import android.util.Log;
@@ -107,6 +111,7 @@ public class UI {
     public int textColorInt;
     public int selectedColorInt;
     private int selectedBGInt;
+    private LinearLayoutManager layoutManager;
 
     public void skin () throws JSONException {
         Log.d(TAG, "skin() called");
@@ -240,6 +245,7 @@ public class UI {
         mainActivity.root.addView(repeat);
 
         volume = (SeekBar) createView(skinFormat.getJSONObject("main_window").getJSONObject("volume"));
+        volume.setTag("volume");
         mainActivity.root.addView(volume);
         balance = (SeekBar) createView(skinFormat.getJSONObject("main_window").getJSONObject("balance"));
         mainActivity.root.addView(balance);
@@ -262,11 +268,55 @@ public class UI {
             eq_slider_list.add((SeekBar) seekBar);
             ((SeekBar) seekBar).setMax(100);
             ((SeekBar) seekBar).setMin(-100);
+            if (i > 0) {
+                seekBar.setTag("eq" + (i - 1));
+                int finalI = i - 1;
+                ((SeekBar) seekBar).setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+                    final int tmp = finalI;
+                    @Override
+                    public void onProgressChanged(SeekBar seekBar, int value, boolean b) {
+                        mainActivity.player.equalizer.setBandLevel(mainActivity.player.equalizer.getBand(mainActivity.player.eqBands [finalI]), (short) value);
+                        Log.d(TAG, "onProgressChanged: " + tmp + " " + value);
+                    }
+
+                    @Override
+                    public void onStartTrackingTouch(SeekBar seekBar) {
+
+                    }
+
+                    @Override
+                    public void onStopTrackingTouch(SeekBar seekBar) {
+
+                    }
+                });
+            }
+            else {
+                seekBar.setTag("preamp");
+                ((SeekBar) seekBar).setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+                    @Override
+                    public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+                        mainActivity.player.loudnessEnhancer.setTargetGain(i);
+                        Log.d(TAG, "onProgressChanged: " + i + ' ' + mainActivity.player.loudnessEnhancer.getTargetGain());
+                    }
+
+                    @Override
+                    public void onStartTrackingTouch(SeekBar seekBar) {
+
+                    }
+
+                    @Override
+                    public void onStopTrackingTouch(SeekBar seekBar) {
+
+                    }
+                });
+            }
             mainActivity.root.addView(seekBar);
         }
 
         toggle_eq = (ToggleButton) createView(skinFormat.getJSONObject("equalizer_window").getJSONObject("on_off_button"));
         mainActivity.root.addView(toggle_eq);
+        toggle_eq.setTag("eq_toggle");
+
         auto_eq = (ToggleButton) createView(skinFormat.getJSONObject("equalizer_window").getJSONObject("auto_button"));
         mainActivity.root.addView(auto_eq);
         presets = (Button) createView(skinFormat.getJSONObject("equalizer_window").getJSONObject("presets_button"));
@@ -301,7 +351,8 @@ public class UI {
         params.startToStart = ConstraintLayout.LayoutParams.PARENT_ID;
         recyclerView.setLayoutParams(params);
 
-        recyclerView.setLayoutManager(new LinearLayoutManager(mainActivity));
+        layoutManager = new LinearLayoutManager(mainActivity);
+        recyclerView.setLayoutManager(layoutManager);
 
         playlistAdapter = new PlaylistAdapter(mainActivity, songsList,
                 new PlaylistAdapter.OnItemClickListener() {
@@ -391,6 +442,8 @@ public class UI {
         posbar.setThumbTintBlendMode(BlendMode.CLEAR);
         posbar.setProgress(0);
 
+        posbar.setVisibility(View.GONE);
+
         plAdd = new Button(mainActivity);
         plAdd.setBackgroundColor(mainActivity.getResources().getColor(android.R.color.transparent));
         add (plAdd, 28, 25, 10, (int) (mainActivity.skin.metrics.heightPixels / mainActivity.skin.scale) - 86);
@@ -428,6 +481,27 @@ public class UI {
     }
 
     void setupCallbacks () {
+        eject.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mainActivity.openFilePicker(MainActivity.AUDIO_FILE_REQUEST_CODE);
+            }
+        });
+
+        prev.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                playPrevious();
+            }
+        });
+
+        next.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                playNext();
+            }
+        });
+
         posbar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
@@ -488,6 +562,30 @@ public class UI {
             }
         });
 
+        mSelect.getMenu ().findItem(R.id.select_all).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(@NonNull MenuItem menuItem) {
+                playlistAdapter.selectAll();
+                return false;
+            }
+        });
+
+        mSelect.getMenu ().findItem(R.id.unselect_all).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(@NonNull MenuItem menuItem) {
+                playlistAdapter.selectNone();
+                return false;
+            }
+        });
+
+        mSelect.getMenu ().findItem(R.id.select_invert).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(@NonNull MenuItem menuItem) {
+                playlistAdapter.invertSelection();
+                return false;
+            }
+        });
+
         PopupMenu mLoad = new PopupMenu(mainActivity, plLoad);
         mLoad.getMenuInflater().inflate(R.menu.load_pl, mLoad.getMenu());
 
@@ -513,6 +611,7 @@ public class UI {
                 return false;
             }
         });
+
         mRemove.getMenu().findItem(R.id.pl_remove_all).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(@NonNull MenuItem menuItem) {
@@ -520,6 +619,56 @@ public class UI {
                 return false;
             }
         });
+
+        mRemove.getMenu().findItem(R.id.pl_remove_selected).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(@NonNull MenuItem menuItem) {
+                removeSelectedSongs();
+                return false;
+            }
+        });
+
+        mRemove.getMenu().findItem(R.id.pl_remove_unselected).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(@NonNull MenuItem menuItem) {
+                removeUnselectedSongs();
+                return false;
+            }
+        });
+
+        mLoad.getMenu().findItem(R.id.pl_save).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(@NonNull MenuItem menuItem) {
+                mainActivity.savePlaylist();
+                return false;
+            }
+        });
+
+        mLoad.getMenu().findItem(R.id.pl_load).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(@NonNull MenuItem menuItem) {
+                mainActivity.loadPlaylist();
+                return false;
+            }
+        });
+
+
+    }
+
+    private void removeSelectedSongs() {
+        List<Song> selectedSongs = playlistAdapter.getSelectedSongs();
+        songsList.removeAll(selectedSongs);
+        playlistAdapter.notifyDataSetChanged();
+        playlistAdapter.clearSelection();
+        saveCurrentPlaylist();
+    }
+
+    private void removeUnselectedSongs() {
+        List<Song> selectedSongs = playlistAdapter.getUnselectedSongs();
+        songsList.removeAll(selectedSongs);
+        playlistAdapter.notifyDataSetChanged();
+        playlistAdapter.clearSelection();
+        saveCurrentPlaylist();
     }
 
     void add (View view, int w, int h, int x, int y) {
@@ -641,6 +790,10 @@ public class UI {
                         } else {
                             compoundButton.setBackground(new BitmapDrawable(mainActivity.getResources(), mainActivity.skin.states.get(name).get(0)));
                         }
+
+                        if (compoundButton.getTag().equals("eq_toggle")) {
+                            mainActivity.player.equalizer.setEnabled(b);
+                        }
                     }
                 });
             }
@@ -715,6 +868,17 @@ public class UI {
 //                                Log.d(TAG, "Component Key: " + componentNameKey);
 //                            }
 
+                            if (seekBar.getTag().toString().equals("volume")) {
+                                mainActivity.player.player.setVolume((float) i / 100f);
+                            } else if (seekBar.getTag().toString().equals("preamp")) {
+                                mainActivity.player.loudnessEnhancer.setTargetGain(i);
+                                Log.d(TAG, String.format ("[preamp]: %d %d", i, mainActivity.player.loudnessEnhancer.getTargetGain()));
+                            } else if (seekBar.getTag().toString().startsWith("eq")) {
+                                int band = Integer.parseInt(seekBar.getTag().toString().substring(2));
+                                mainActivity.player.equalizer.setBandLevel(mainActivity.player.equalizer.getBand(mainActivity.player.eqBands [band]), (short) i);
+                                Log.d(TAG, String.format ("[eq] %d: %d", band, i));
+                            }
+
                             int key = (int) ((i / 100.0f) * 27);
                             Bitmap bit = null;
 //                                Log.d(TAG, String.format("%s %d: %d", name, i, key));
@@ -773,7 +937,7 @@ public class UI {
 
     private void playSong(Song song) {
         // ... your logic to start playing the selected song
-        Toast.makeText(mainActivity, "Playing: " + song.getTitle(), Toast.LENGTH_SHORT).show();
+//        Toast.makeText(mainActivity, "Playing: " + song.getTitle(), Toast.LENGTH_SHORT).show();
         displayBar.setText(song.title);
         mainActivity.player.play(song.getUri());
     }
@@ -830,7 +994,7 @@ public class UI {
         saveCurrentPlaylist();
     }
 
-    void registerButtons () {
+    @OptIn(markerClass = UnstableApi.class) void registerButtons () {
         play.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -881,7 +1045,28 @@ public class UI {
                     m2.setImageDrawable(null);
                     s1.setImageDrawable(null);
                     s2.setImageDrawable(null);
+                    displayBar.setText("");
                     Log.d(TAG, "onPlaybackStateChanged: stopping");
+                    playNext();
+                }
+            }
+
+            @Override
+            public void onAudioSessionIdChanged(int audioSessionId) {
+                Player.Listener.super.onAudioSessionIdChanged(audioSessionId);
+                Log.d(TAG, "onAudioSessionIdChanged: " + audioSessionId);
+                mainActivity.player.equalizer = new Equalizer(0, audioSessionId);
+
+                mainActivity.player.loudnessEnhancer = new LoudnessEnhancer(audioSessionId);
+                Log.d(TAG, "Available EQ Bands:");
+                for (short i = 0; i < mainActivity.player.equalizer.getNumberOfBands(); i++) {
+                    Log.d(TAG, "Band " + i + ": " + mainActivity.player.equalizer.getCenterFreq(i) / 1000 + " Hz");
+                }
+                mainActivity.player.equalizer.setEnabled(false);
+                for (short i = 0; i < mainActivity.player.eqBands.length; i++) {
+                    short band = mainActivity.player.equalizer.getBand(mainActivity.player.eqBands [i]) ;
+                    Log.d(TAG, String.format ("[%d]: %d", mainActivity.player.eqBands[i], band));
+                    mainActivity.player.equalizer.setBandLevel(band, (short) 0);
                 }
             }
         });
@@ -944,4 +1129,33 @@ public class UI {
         }
     }
 
+    public void playNext () {
+        View view = null;
+        if (playlistAdapter.nowPlaying < songsList.size() - 1) {
+            view = layoutManager.findViewByPosition(playlistAdapter.nowPlaying + 1);
+        } else if (repeat.isChecked())
+            view = layoutManager.findViewByPosition(0);
+
+        if (view != null)
+            view.performClick();
+    }
+
+    public void playPrevious () {
+        View view = null;
+        if (playlistAdapter.nowPlaying > 0) {
+            view = layoutManager.findViewByPosition(playlistAdapter.nowPlaying - 1);
+        }
+        else if (repeat.isChecked())
+            view = layoutManager.findViewByPosition(songsList.size() - 1);
+
+        if (view != null)
+            view.performClick();
+    }
+
+    public void deletePlaylist(File file) {
+        if (file.exists()) {
+            if (file.delete())
+                Toast.makeText(mainActivity, "Playlist deleted", Toast.LENGTH_SHORT).show();
+        }
+    }
 }
