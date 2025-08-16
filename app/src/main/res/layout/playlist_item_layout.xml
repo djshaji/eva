@@ -1,0 +1,19 @@
+<!-- res/layout/playlist_item_layout.xml -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="wrap_content"
+    android:orientation="vertical" android:padding="0dp"
+    android:background="@drawable/playlist_item_background">
+
+    <TextView
+        android:id="@+id/song_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/vt323"
+        android:text="Song"
+        android:textSize="14sp"
+        android:textStyle="bold" />
+
+    <TextView android:visibility="gone" android:id="@+id/song_artist" android:layout_width="match_parent"
+        android:layout_height="wrap_content" android:textSize="14sp" />
+
+</LinearLayout>

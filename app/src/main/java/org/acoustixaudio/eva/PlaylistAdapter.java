@@ -18,8 +18,11 @@ public class PlaylistAdapter extends RecyclerView.Adapter<PlaylistAdapter.SongVi
     private List<Song> songs;
     private OnItemClickListener onItemClickListener;
     private OnItemLongClickListener onItemLongClickListener;
+    int nowPlaying = 0 ;
+    TextView nowPlayingTitle;
 
     private boolean multiSelectMode = false;
+    public MainActivity mainActivity ;
     private Set<Integer> selectedItems = new HashSet<>(); // Store indices of selected items
 
     // Interfaces for click listeners
@@ -31,8 +34,9 @@ public class PlaylistAdapter extends RecyclerView.Adapter<PlaylistAdapter.SongVi
         void onItemLongClick(Song song, int position);
     }
 
-    public PlaylistAdapter(List<Song> songs, OnItemClickListener onItemClickListener, OnItemLongClickListener onItemLongClickListener) {
+    public PlaylistAdapter(MainActivity _mMainActivity, List<Song> songs, OnItemClickListener onItemClickListener, OnItemLongClickListener onItemLongClickListener) {
         this.songs = songs;
+        this.mainActivity = _mMainActivity;
         this.onItemClickListener = onItemClickListener;
         this.onItemLongClickListener = onItemLongClickListener;
     }
@@ -49,6 +53,7 @@ public class PlaylistAdapter extends RecyclerView.Adapter<PlaylistAdapter.SongVi
     public void onBindViewHolder(@NonNull SongViewHolder holder, int position) {
         Song currentSong = songs.get(position);
         holder.bind(currentSong, position);
+        holder.titleTextView.setTextColor(mainActivity.ui.textColorInt);
     }
 
     @Override
@@ -133,6 +138,11 @@ public class PlaylistAdapter extends RecyclerView.Adapter<PlaylistAdapter.SongVi
                     } else {
                         if (onItemClickListener != null && getAdapterPosition() != RecyclerView.NO_POSITION) {
                             onItemClickListener.onItemClick(songs.get(getAdapterPosition()), getAdapterPosition());
+                            titleTextView.setTextColor(mainActivity.ui.selectedColorInt);
+                            if (nowPlayingTitle != null)
+                                nowPlayingTitle.setTextColor(mainActivity.ui.textColorInt);
+                            nowPlaying = getAdapterPosition();
+                            nowPlayingTitle = titleTextView;
                         }
                     }
                 }

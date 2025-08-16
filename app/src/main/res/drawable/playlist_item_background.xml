@@ -1,0 +1,5 @@
+<!-- res/drawable/playlist_item_background.xml -->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:state_activated="true" android:drawable="@color/blue" /> <!-- Define this color -->
+    <item android:drawable="@android:color/transparent" /> <!-- Default background -->
+</selector>

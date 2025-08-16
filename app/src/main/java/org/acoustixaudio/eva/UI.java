@@ -24,6 +24,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.BlendMode;
 import android.graphics.Color;
 import android.graphics.Matrix;
+import android.graphics.Typeface;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
@@ -40,6 +41,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.PopupMenu;
 import android.widget.SeekBar;
+import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
@@ -56,6 +58,7 @@ public class UI {
     ImageView mainWindow = null, equalizer ;
     ToggleButton toggle_eq ;
     JSONObject skinFormat = null ;
+    TextView displayBar ;
 
     RecyclerView recyclerView ;
     public PlaylistAdapter playlistAdapter ;
@@ -100,6 +103,10 @@ public class UI {
     private Handler handler;
     private Runnable runnable;
     ImageView m1, m2, s1, s2;
+    public int plColorInt;
+    public int textColorInt;
+    public int selectedColorInt;
+    private int selectedBGInt;
 
     public void skin () throws JSONException {
         Log.d(TAG, "skin() called");
@@ -159,11 +166,18 @@ public class UI {
         paintView(pl_bright, skinFormat.getJSONObject("playlist").getJSONObject("titlebar").getJSONObject("bright"), false);
 
         String plColor = ((JSONObject)(mainActivity.skin.inis.get("pledit.txt"))).getJSONObject ("Text").get ("NormalBG").toString();
-        int plColorInt = Color.parseColor(plColor);
+        String textColor = ((JSONObject)(mainActivity.skin.inis.get("pledit.txt"))).getJSONObject ("Text").get ("Normal").toString();
+        String selectedColor = ((JSONObject)(mainActivity.skin.inis.get("pledit.txt"))).getJSONObject ("Text").get ("Current").toString();
+        String selectedBG = ((JSONObject)(mainActivity.skin.inis.get("pledit.txt"))).getJSONObject ("Text").get ("SelectedBG").toString();
+        plColorInt = Color.parseColor(plColor);
+        textColorInt = Color.parseColor(textColor);
+        selectedColorInt = Color.parseColor(selectedColor);
+        selectedBGInt = Color.parseColor(selectedBG);
         recyclerView.setBackgroundColor(plColorInt);
         Log.i(TAG, "plColor: " + plColor);
 
         setupNumbers();
+        displayBar.setTextColor(textColorInt);
     }
 
     public void create () throws JSONException {
@@ -276,7 +290,7 @@ public class UI {
         recyclerView = new RecyclerView(mainActivity);
         int rw = (int) (250 * mainActivity.skin.scale);
         int rh = (int) (mainActivity.skin.metrics.heightPixels - ((statusBar + 116 + 30 + 140) * mainActivity.skin.scale));
-        int marginLeft = 12;
+        int marginLeft = 15;
         marginLeft = (int) (marginLeft * mainActivity.skin.scale) ;
         int marginTop = 252;
         marginTop = (int) (marginTop * mainActivity.skin.scale) ;
@@ -286,11 +300,10 @@ public class UI {
         params.topToTop = ConstraintLayout.LayoutParams.PARENT_ID;
         params.startToStart = ConstraintLayout.LayoutParams.PARENT_ID;
         recyclerView.setLayoutParams(params);
-        mainActivity.root.addView(recyclerView);
 
         recyclerView.setLayoutManager(new LinearLayoutManager(mainActivity));
 
-        playlistAdapter = new PlaylistAdapter(songsList,
+        playlistAdapter = new PlaylistAdapter(mainActivity, songsList,
                 new PlaylistAdapter.OnItemClickListener() {
                     @Override
                     public void onItemClick(Song song, int position) {
@@ -359,18 +372,12 @@ public class UI {
                         150, 38
                 }));
 
+        mainActivity.root.addView(recyclerView);
+
         pl_bleft = (ImageView) createView(bleft);
         mainActivity.root.addView(pl_bleft);
         pl_bright = (ImageView) createView(blr);
         mainActivity.root.addView(pl_bright);
-
-        try {
-            skin();
-        } catch (Exception e) {
-            Log.e(TAG, "create: failed to load user skin", e);
-            mainActivity.skin.load();
-            skin ();
-        }
 
         volume.setMax(100);
         volume.setMin(0);
@@ -409,6 +416,11 @@ public class UI {
         add (s1, 9, 13, 78, 26);
         add (s2, 9, 13, 90, 26);
 
+        displayBar = new TextView(mainActivity);
+        displayBar.setTypeface(Typeface.createFromAsset(mainActivity.getAssets(), "vt323.ttf"));
+        displayBar.setTextSize(10);
+        displayBar.setTextColor(mainActivity.getResources().getColor(android.R.color.white));
+        add (displayBar, 155, 15, 115, 21);
         registerButtons();
         playlistMenus();
 
@@ -762,6 +774,7 @@ public class UI {
     private void playSong(Song song) {
         // ... your logic to start playing the selected song
         Toast.makeText(mainActivity, "Playing: " + song.getTitle(), Toast.LENGTH_SHORT).show();
+        displayBar.setText(song.title);
         mainActivity.player.play(song.getUri());
     }
 

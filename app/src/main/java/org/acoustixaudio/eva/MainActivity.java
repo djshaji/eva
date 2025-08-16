@@ -116,6 +116,7 @@ public class MainActivity extends AppCompatActivity {
 
         try {
             ui.create();
+            ui.skin();
         } catch (JSONException e) {
             throw new RuntimeException(e);
         }
