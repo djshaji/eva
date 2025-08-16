@@ -25,6 +25,7 @@ public class Skin {
     HashMap <String, JSONObject> inis = new HashMap<>();
     HashMap <String, BitmapDrawable> skin = new HashMap<>();
     HashMap <String, HashMap<Integer, Bitmap>> states ;
+    Bitmap numbersBitmap ;
     String [] ini_filenames = {
 //            "region.txt",
 //            "viscolor.txt",

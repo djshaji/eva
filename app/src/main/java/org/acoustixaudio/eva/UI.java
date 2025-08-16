@@ -63,6 +63,7 @@ public class UI {
     private ActionMode actionMode;
     private ActionMode.Callback actionModeCallback;
 
+    HashMap <Integer, Bitmap> numbers;
     ArrayList <SeekBar> eq_slider_list = new ArrayList<>();
     ArrayList <ImageView> pl_title_list = new ArrayList<>();
     ArrayList <ImageView> pl_border_left_list = new ArrayList<>();
@@ -98,6 +99,7 @@ public class UI {
     private String defaultPlaylist;
     private Handler handler;
     private Runnable runnable;
+    ImageView m1, m2, s1, s2;
 
     public void skin () throws JSONException {
         Log.d(TAG, "skin() called");
@@ -160,11 +162,22 @@ public class UI {
         int plColorInt = Color.parseColor(plColor);
         recyclerView.setBackgroundColor(plColorInt);
         Log.i(TAG, "plColor: " + plColor);
+
+        setupNumbers();
     }
 
     public void create () throws JSONException {
         handler = new Handler();
-        
+        m1 = new ImageView(mainActivity);
+        m2 = new ImageView(mainActivity);
+        s1 = new ImageView(mainActivity);
+        s2 = new ImageView(mainActivity);
+
+        m1.setBackgroundColor(mainActivity.getResources().getColor(android.R.color.transparent));
+        m2.setBackgroundColor(mainActivity.getResources().getColor(android.R.color.transparent));
+        s1.setBackgroundColor(mainActivity.getResources().getColor(android.R.color.transparent));
+        s2.setBackgroundColor(mainActivity.getResources().getColor(android.R.color.transparent));
+
         defaultPlaylist = mainActivity.getFilesDir().getAbsolutePath() + "/playlist.m3u";
         mainWindow = (ImageView) createView(skinFormat.getJSONObject("main_window").getJSONObject("background"));
         mainActivity.root.addView(mainWindow);
@@ -391,8 +404,36 @@ public class UI {
         plLoad.setBackgroundColor(mainActivity.getResources().getColor(android.R.color.transparent));
         add (plLoad, 28, 25, (int) (mainActivity.skin.metrics.widthPixels / mainActivity.skin.scale) - 46, (int) (mainActivity.skin.metrics.heightPixels / mainActivity.skin.scale) - 86);
 
+        add (m1, 9, 13, 49, 26);
+        add (m2, 9, 13, 60, 26);
+        add (s1, 9, 13, 78, 26);
+        add (s2, 9, 13, 90, 26);
+
         registerButtons();
         playlistMenus();
+
+        setupCallbacks();
+    }
+
+    void setupCallbacks () {
+        posbar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+                if (b) {
+                    mainActivity.player.player.seekTo((long) ((i / 100.0) * mainActivity.player.player.getDuration()));
+                }
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
     }
 
     void playlistMenus () {
@@ -823,6 +864,10 @@ public class UI {
 
                 if (playbackState == Player.STATE_ENDED || playbackState == Player.STATE_IDLE) {
                     posbar.setVisibility(View.GONE);
+                    m1.setImageDrawable(null);
+                    m2.setImageDrawable(null);
+                    s1.setImageDrawable(null);
+                    s2.setImageDrawable(null);
                     Log.d(TAG, "onPlaybackStateChanged: stopping");
                 }
             }
@@ -851,11 +896,39 @@ public class UI {
         runnable = new Runnable() {
             @Override
             public void run() {
-                posbar.setProgress((int) ((mainActivity.player.player.getCurrentPosition()*100)/mainActivity.player.player.getDuration()));
+                double pos = ((double) mainActivity.player.player.getCurrentPosition() / mainActivity.player.player.getDuration()) * 100;
+                posbar.setProgress((int) pos);
+                long currentPosition = mainActivity.player.player.getCurrentPosition();
+                int minutes = (int) (currentPosition / (1000 * 60));
+                int seconds = (int) ((currentPosition / 1000) % 60);
+
+                int minuteFirstDigit = minutes / 10;
+                int minuteSecondDigit = minutes % 10;
+                int secondFirstDigit = seconds / 10;
+                int secondSecondDigit = seconds % 10;
+//                Log.d(TAG, String.format ("%d%d:%d%d", minuteFirstDigit, minuteSecondDigit, secondFirstDigit, secondSecondDigit));
+                m1.setImageDrawable(new BitmapDrawable(numbers.get(minuteFirstDigit)));
+                m2.setImageDrawable(new BitmapDrawable(numbers.get(minuteSecondDigit)));
+                s1.setImageDrawable(new BitmapDrawable(numbers.get(secondFirstDigit)));
+                s2.setImageDrawable(new BitmapDrawable(numbers.get(secondSecondDigit)));
                 handler.postDelayed(runnable, 1000);
             }
         };
 
         handler.postDelayed(runnable, 0);
     }
+
+    void setupNumbers () {
+        numbers = new HashMap<>();
+        for (int i = 0 ; i < 10; i ++) {
+            Bitmap bitmap = null;
+            try {
+                bitmap = getCroppedScaledBitmap(mainActivity.skin.skin.get("numbers.bmp").getBitmap(), new JSONArray(new int[]{9 * i, 0, 9, 13}));
+            } catch (JSONException e) {
+                throw new RuntimeException(e);
+            }
+            numbers.put(i, bitmap);
+        }
+    }
+
 }
