@@ -704,7 +704,10 @@ public class UI {
     public void addToPlaylist (Uri uri) {
         Log.i(TAG, "addToPlaylist() called with: uri = [" + uri + "]");
 //        Song song = new Song(uri);
+        if (uri == null)
+            return;
         Song song = new Song(uri);
+        mainActivity.player.setMetadata(song);
 
         songsList.add(song);
         playlistAdapter.notifyItemInserted(songsList.size() - 1);

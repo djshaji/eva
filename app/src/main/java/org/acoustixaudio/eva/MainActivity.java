@@ -1,7 +1,9 @@
 package org.acoustixaudio.eva;
 
 import android.content.Intent;
+import android.database.Cursor;
 import android.os.Bundle;
+import android.provider.OpenableColumns;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -203,6 +205,7 @@ public class MainActivity extends AppCompatActivity {
 
         if (requestCode == AUDIO_FILE_REQUEST_CODE && resultCode == RESULT_OK) {
             Uri uri = data.getData();
+            String filename = getFileNameFromUri(uri);
             ui.addToPlaylist(uri);
             getContentResolver().takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
             return;
@@ -303,5 +306,29 @@ public class MainActivity extends AppCompatActivity {
 
     void popupMenu () {
         popup.show();
+    }
+
+
+    public String getFileNameFromUri(Uri uri) {
+        String result = null;
+        if (uri.getScheme().equals("content")) {
+            Cursor cursor = getContentResolver().query(uri, null, null, null, null);
+            try {
+                if (cursor != null && cursor.moveToFirst()) {
+                    int nameIndex = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME);
+                    if (nameIndex != -1) { // Check if column exists
+                        result = cursor.getString(nameIndex);
+                    }
+                }
+            } finally {
+                if (cursor != null) {
+                    cursor.close();
+                }
+            }
+        } else if (uri.getScheme().equals("file")) {
+            // For file URIs, the last segment of the path is usually the file name
+            result = uri.getLastPathSegment();
+        }
+        return result;
     }
 }

@@ -5,10 +5,11 @@ import android.net.Uri;
 public class Song {
     private long id;
     private Uri uri;
-    private String title;
-    private String artist;
-    private String albumArtUri; // Optional: Path to album art
-    private boolean isSelected; // To track selection state
+    public String title;
+    public String artist;
+    public String album ;
+    public String albumArtUri; // Optional: Path to album art
+    public boolean isSelected; // To track selection state
 
     public Song(long id, Uri uri, String title, String artist, String albumArtUri) {
         this.id = id;
@@ -55,6 +56,20 @@ public class Song {
     public Uri getUri() {
         return uri;
     }
+
+    @Override
+    public String toString() {
+        return "Song{" +
+                "id=" + id +
+                ", uri=" + uri +
+                ", title='" + title + '\'' +
+                ", artist='" + artist + '\'' +
+                ", album='" + album + '\'' +
+                ", albumArtUri='" + albumArtUri + '\'' +
+                ", isSelected=" + isSelected +
+                '}';
+    }
+
 
     // You might want to override equals() and hashCode() if you're using Sets of Songs directly
 }
