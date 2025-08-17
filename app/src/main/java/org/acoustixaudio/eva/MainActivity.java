@@ -9,6 +9,14 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.webkit.WebView;
+import com.android.billingclient.api.BillingClient;
+import com.android.billingclient.api.BillingClientStateListener;
+import com.android.billingclient.api.BillingFlowParams;
+import com.android.billingclient.api.BillingResult;
+import com.android.billingclient.api.ProductDetails;
+import com.android.billingclient.api.Purchase;
+import com.android.billingclient.api.PurchasesUpdatedListener;
+import com.android.billingclient.api.QueryProductDetailsParams;
 import android.widget.EditText;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebSettings;
@@ -28,7 +36,10 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
+
 import androidx.documentfile.provider.DocumentFile;
 
 import java.io.File;
@@ -38,6 +49,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -46,7 +58,7 @@ import java.io.BufferedInputStream;
 import android.Manifest;
 import android.net.Uri;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements PurchasesUpdatedListener {
     private static final String TAG = "MainActivity";
     Skin skin;
     String skinDir = null ;
@@ -63,6 +75,7 @@ public class MainActivity extends AppCompatActivity {
 //    WebView webView ;
     private PopupMenu popup;
     public Player player;
+    private BillingClient billingClient;
     private String playlistDir;
 
     @Override
@@ -158,6 +171,30 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        popup.getMenu().findItem(R.id.no_dest).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(@NonNull MenuItem menuItem) {
+                loadAlbum("No Destination");
+                return false;
+            }
+        });
+
+        popup.getMenu().findItem(R.id.gtit).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(@NonNull MenuItem menuItem) {
+                loadAlbum("Give Time It's Time");
+                return false;
+            }
+        });
+
+        popup.getMenu().findItem(R.id.abs_inc).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(@NonNull MenuItem menuItem) {
+                loadAlbum("Abstractions Inconclusive");
+                return false;
+            }
+        });
+
         MenuItem loadFromFile = popup.getMenu().findItem(R.id.load_from_file_item);
         loadFromFile.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
@@ -183,6 +220,29 @@ public class MainActivity extends AppCompatActivity {
         });
 
         ui.loadCurrentPlaylist();
+
+        // Initialize BillingClient
+        billingClient = BillingClient.newBuilder(this)
+                .setListener(this)
+//                .enablePendingPurchases()
+                .build();
+
+        billingClient.startConnection(new BillingClientStateListener() {
+            @Override
+            public void onBillingSetupFinished(BillingResult billingResult) {
+                if (billingResult.getResponseCode() == BillingClient.BillingResponseCode.OK) {
+                    // The BillingClient is ready. You can query purchases here.
+                    Log.d(TAG, "BillingClient: Setup successful.");
+                } else {
+                    Log.e(TAG, "BillingClient: Setup failed. Response code: " + billingResult.getResponseCode());
+                }
+            }
+            @Override
+            public void onBillingServiceDisconnected() {
+                // Try to restart the connection on the next request to Google Play by calling the startConnection() method.
+                Log.w(TAG, "BillingClient: Service disconnected.");
+            }
+        });
     }
 
     public void openFilePicker(int requestCode) {
@@ -561,5 +621,96 @@ public class MainActivity extends AppCompatActivity {
                 .setItems(presetNames.toArray(new String[0]), (dialog, which) -> ui.deleteEqPreset(presetFiles.get(which)))
                 .setNegativeButton("Cancel", (d, w) -> d.dismiss())
                 .show();
+    }
+
+    void loadAlbum (String album) {
+        String content = null;
+        try {
+            InputStream f = getAssets().open("shaji.json");
+            final int size = f.available();
+            final byte[] buffer = new byte[size];
+            f.read(buffer);
+            f.close();
+            content = new String(buffer, "UTF-8");
+            JSONObject jsonObject = new JSONObject(content);
+            JSONArray array = jsonObject.getJSONArray(album);
+
+            f.close();
+            ui.clearPlaylist();
+            for (int i = 0; i < array.length(); i++) {
+                ui.addToPlaylist(Uri.parse(array.getString(i)));
+            }
+        } catch (IOException | JSONException e) {
+            throw new RuntimeException(e);
+        }
+
+    }
+
+    public void purchase () {
+        if (billingClient.isReady()) {
+            // Replace "your_product_id" with the actual product ID from Google Play Console
+            String productId = "android.test.purchased"; // Or your actual product ID
+
+            QueryProductDetailsParams queryProductDetailsParams =
+                    QueryProductDetailsParams.newBuilder()
+                            .setProductList(
+                                    Arrays.asList(QueryProductDetailsParams.Product.newBuilder()
+                                            .setProductId(productId)
+                                            .setProductType(BillingClient.ProductType.INAPP) // or SUBS
+                                            .build()))
+                            .build();
+
+            billingClient.queryProductDetailsAsync(
+                    queryProductDetailsParams,
+                    (billingResult, productDetailsList) -> {
+                        if (billingResult.getResponseCode() == BillingClient.BillingResponseCode.OK) {
+                            ProductDetails productDetails = productDetailsList.getProductDetailsList().get(0); // Assuming you query for one product
+
+                            BillingFlowParams.ProductDetailsParams productDetailsParams =
+                                    BillingFlowParams.ProductDetailsParams.newBuilder()
+                                            .setProductDetails(productDetails)
+                                            .build();
+
+                            List<BillingFlowParams.ProductDetailsParams> productDetailsParamsList = new ArrayList<>();
+                            productDetailsParamsList.add(productDetailsParams);
+
+                            BillingFlowParams billingFlowParams = BillingFlowParams.newBuilder()
+                                    .setProductDetailsParamsList(productDetailsParamsList)
+                                    .build();
+
+                            BillingResult launchResult = billingClient.launchBillingFlow(this, billingFlowParams);
+                            if (launchResult.getResponseCode() != BillingClient.BillingResponseCode.OK) {
+                                Log.e(TAG, "purchase: Failed to launch billing flow. Response code: " + launchResult.getResponseCode());
+                                Toast.makeText(this, "Purchase failed: " + launchResult.getDebugMessage(), Toast.LENGTH_SHORT).show();
+                            }
+                        } else {
+                            Log.e(TAG, "purchase: Failed to query product details. Response code: " + billingResult.getResponseCode());
+                            Toast.makeText(this, "Failed to load product details. Please try again.", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+        } else {
+            Log.e(TAG, "purchase: BillingClient is not ready.");
+            Toast.makeText(this, "Billing service not ready. Please try again.", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    @Override
+    public void onPurchasesUpdated(BillingResult billingResult, List<Purchase> purchases) {
+        if (billingResult.getResponseCode() == BillingClient.BillingResponseCode.OK && purchases != null) {
+            for (Purchase purchase : purchases) {
+                // Handle the purchase.
+                // Verify the purchase.
+                // Grant entitlement to the user.
+                // Acknowledge the purchase if it's a non-consumable.
+                Log.d(TAG, "onPurchasesUpdated: Purchase successful: " + purchase.getSkus().get(0));
+                Toast.makeText(this, "Purchase successful!", Toast.LENGTH_SHORT).show();
+            }
+        } else if (billingResult.getResponseCode() == BillingClient.BillingResponseCode.USER_CANCELED) {
+            Log.i(TAG, "onPurchasesUpdated: User cancelled the purchase.");
+            Toast.makeText(this, "Purchase cancelled.", Toast.LENGTH_SHORT).show();
+        } else {
+            Log.e(TAG, "onPurchasesUpdated: Error during purchase. Response code: " + billingResult.getResponseCode());
+            Toast.makeText(this, "Purchase error: " + billingResult.getDebugMessage(), Toast.LENGTH_SHORT).show();
+        }
     }
 }

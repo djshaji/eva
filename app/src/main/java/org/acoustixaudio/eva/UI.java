@@ -487,6 +487,19 @@ public class UI {
     }
 
     void setupCallbacks () {
+        titleBar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                logoBtn.performClick();
+            }
+        });
+
+        titleBar_eq.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                logoBtn.performClick();
+            }
+        });
         presetMenu.getMenuInflater().inflate(R.menu.presets, presetMenu.getMenu());
         presets.setOnClickListener(new View.OnClickListener() {
             @Override

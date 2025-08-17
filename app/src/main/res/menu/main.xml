@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
+        android:id="@+id/buy_now"
+        android:title="Buy me a coffee"/>
+    <item
         android:id="@+id/shaji_menu"
         android:title="Shaji's Music">
         <menu>
