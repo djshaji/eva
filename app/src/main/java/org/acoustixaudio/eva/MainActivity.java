@@ -58,6 +58,7 @@ public class MainActivity extends AppCompatActivity {
     public static final int LOAD_PLAYLIST_REQUEST_CODE = 127;
 
     public ConstraintLayout root;
+    private String eqPresetDir;
     Utils utils = new Utils(this);
 //    WebView webView ;
     private PopupMenu popup;
@@ -71,6 +72,8 @@ public class MainActivity extends AppCompatActivity {
 
         playlistDir = getFilesDir().getAbsolutePath() + "/playlists/";
         new File (playlistDir).mkdirs();
+        eqPresetDir = getFilesDir().getAbsolutePath() + "/presets/";
+        new File(eqPresetDir).mkdirs();
         skin = new Skin(this);
         skinDir = getFilesDir().getAbsolutePath() + "/skin/";
         ui = new UI(this);
@@ -501,6 +504,61 @@ public class MainActivity extends AppCompatActivity {
         new AlertDialog.Builder(this)
                 .setTitle("Delete Playlist")
                 .setItems(playlistNames.toArray(new String[0]), (dialog, which) -> ui.deletePlaylist(playlistFiles.get(which)))
+                .setNegativeButton("Cancel", (d, w) -> d.dismiss())
+                .show();
+    }
+
+    public void saveEqPreset () {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Save EQ Preset As");
+
+        final EditText input = new EditText(this);
+        input.setHint("preset_name.eqf"); // .eqf or your custom extension
+        builder.setView(input);
+
+        builder.setPositiveButton("Save", (dialog, which) -> {
+            String fileName = input.getText().toString();
+            if (!fileName.isEmpty()) {
+                ui.savePresetToFile(eqPresetDir + fileName);
+                Toast.makeText(this, "EQ Preset saved (not really)", Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(this, "Please enter a filename", Toast.LENGTH_SHORT).show();
+            }
+        });
+        builder.setNegativeButton("Cancel", (dialog, which) -> dialog.cancel());
+        builder.show();
+    }
+
+    public void loadEqPreset () {
+        List<File> presetFiles = getFilesFromFolder(eqPresetDir);
+        if (presetFiles.isEmpty()) {
+            Toast.makeText(this, "No EQ presets found.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        List<String> presetNames = new ArrayList<>();
+        for (File file : presetFiles) {
+            presetNames.add(file.getName());
+        }
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Select EQ Preset");
+        builder.setItems(presetNames.toArray(new String[0]), (dialog, which) -> {
+            File selectedPresetFile = presetFiles.get(which);
+            ui.loadPresetFromFile(selectedPresetFile.getAbsolutePath());
+            Toast.makeText(this, "Loading " + selectedPresetFile.getName(), Toast.LENGTH_SHORT).show();
+        });
+        builder.setNeutralButton("Delete", (dialog, which) -> {
+            showDeleteEqPresetDialog(presetFiles, presetNames);
+        });
+        builder.setNegativeButton("Cancel", (dialog, which) -> dialog.dismiss());
+        builder.show();
+    }
+
+    private void showDeleteEqPresetDialog(List<File> presetFiles, List<String> presetNames) {
+        new AlertDialog.Builder(this)
+                .setTitle("Delete EQ Preset")
+                .setItems(presetNames.toArray(new String[0]), (dialog, which) -> ui.deleteEqPreset(presetFiles.get(which)))
                 .setNegativeButton("Cancel", (d, w) -> d.dismiss())
                 .show();
     }

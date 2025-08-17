@@ -50,6 +50,7 @@ import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
@@ -112,6 +113,7 @@ public class UI {
     public int selectedColorInt;
     private int selectedBGInt;
     private LinearLayoutManager layoutManager;
+    PopupMenu presetMenu ;
 
     public void skin () throws JSONException {
         Log.d(TAG, "skin() called");
@@ -267,7 +269,8 @@ public class UI {
             View seekBar = createView(slider);
             eq_slider_list.add((SeekBar) seekBar);
             ((SeekBar) seekBar).setMax(100);
-            ((SeekBar) seekBar).setMin(-100);
+            ((SeekBar) seekBar).setMin(0);
+            ((SeekBar) seekBar).setProgress(50);
             if (i > 0) {
                 seekBar.setTag("eq" + (i - 1));
                 int finalI = i - 1;
@@ -275,8 +278,10 @@ public class UI {
                     final int tmp = finalI;
                     @Override
                     public void onProgressChanged(SeekBar seekBar, int value, boolean b) {
-                        mainActivity.player.equalizer.setBandLevel(mainActivity.player.equalizer.getBand(mainActivity.player.eqBands [finalI]), (short) value);
-                        Log.d(TAG, "onProgressChanged: " + tmp + " " + value);
+                        short[] range = mainActivity.player.equalizer.getBandLevelRange() ;
+                        int eqValue = (range[1] - range[0]) / 100 * value + range[0];
+                        mainActivity.player.equalizer.setBandLevel(mainActivity.player.equalizer.getBand(mainActivity.player.eqBands [finalI]), (short) eqValue);
+                        Log.d(TAG, "onProgressChanged: " + tmp + " " + value + ' ' + Arrays.toString(range) + ' ' + eqValue);
                     }
 
                     @Override
@@ -320,6 +325,7 @@ public class UI {
         auto_eq = (ToggleButton) createView(skinFormat.getJSONObject("equalizer_window").getJSONObject("auto_button"));
         mainActivity.root.addView(auto_eq);
         presets = (Button) createView(skinFormat.getJSONObject("equalizer_window").getJSONObject("presets_button"));
+        presetMenu = new PopupMenu(mainActivity, presets);
         mainActivity.root.addView(presets);
 
         int width = 0 ;
@@ -481,6 +487,24 @@ public class UI {
     }
 
     void setupCallbacks () {
+        presetMenu.getMenuInflater().inflate(R.menu.presets, presetMenu.getMenu());
+        presets.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                presetMenu.show();
+            }
+        });
+
+        presetMenu.getMenu().findItem(R.id.reset_eq).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(@NonNull MenuItem menuItem) {
+                for (int i = 0 ; i < eq_slider_list.size(); i ++) {
+                    eq_slider_list.get(i).setProgress(50);
+                }
+                return false;
+            }
+        });
+
         eject.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -792,7 +816,7 @@ public class UI {
                         }
 
                         if (compoundButton.getTag().equals("eq_toggle")) {
-                            mainActivity.player.equalizer.setEnabled(b);
+                            mainActivity.player.equalizer.setEnabled(!b);
                         }
                     }
                 });
@@ -1156,6 +1180,26 @@ public class UI {
         if (file.exists()) {
             if (file.delete())
                 Toast.makeText(mainActivity, "Playlist deleted", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    public void savePresetToFile (String filename) {
+        ArrayList <String> content = new ArrayList<>();
+        for (int i = 0; i < eq_slider_list.size(); i++) {
+            content.add(String.valueOf(eq_slider_list.get(i).getProgress())).append("\n");
+        }
+
+        Utils.writeArrayToFile(content, filename);
+    }
+
+    public void loadPresetFromFile (String filename) {
+        try {
+            ArrayList <String> content = Utils.readLinesFromFile(filename);
+            for (int i = 0 ; i < content.size(); i++) {
+                eq_slider_list.get(i).setProgress(Integer.parseInt(content.get(i)));
+            }
+        } catch (IOException e) {
+            Log.e(TAG, "loadPresetFromFile: ", e);
         }
     }
 }

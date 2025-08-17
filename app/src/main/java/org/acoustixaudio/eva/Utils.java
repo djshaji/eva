@@ -220,4 +220,16 @@ public class Utils {
         return lines;
     }
 
+    static public void writeArrayToFile (List <String> list, String filename) {
+        try {
+            File file = new File(filename);
+            FileOutputStream fileOutputStream = new FileOutputStream(file);
+            for (String line : list) {
+                fileOutputStream.write((line + "\n").getBytes());
+            }
+            fileOutputStream.close();
+        } catch (IOException e) {
+            Log.e(TAG, "writeArrayToFile: ", e);
+        }
+    }
 }

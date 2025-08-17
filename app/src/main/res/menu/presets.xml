@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/reset_eq"
+        android:title="Reset"/>
+    <item
+        android:id="@+id/load_preset"
+        android:title="Load preset"/>
+    <item
+        android:id="@+id/save_preset"
+        android:title="Save preset"/>
+</menu>
