@@ -505,6 +505,22 @@ public class UI {
             }
         });
 
+        presetMenu.getMenu().findItem(R.id.save_preset).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(@NonNull MenuItem menuItem) {
+                mainActivity.saveEqPreset();
+                return false;
+            }
+        });
+
+        presetMenu.getMenu().findItem(R.id.load_preset).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(@NonNull MenuItem menuItem) {
+                mainActivity.loadEqPreset();
+                return false;
+            }
+        });
+
         eject.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -1186,7 +1202,7 @@ public class UI {
     public void savePresetToFile (String filename) {
         ArrayList <String> content = new ArrayList<>();
         for (int i = 0; i < eq_slider_list.size(); i++) {
-            content.add(String.valueOf(eq_slider_list.get(i).getProgress())).append("\n");
+            content.add(String.valueOf(eq_slider_list.get(i).getProgress()));
         }
 
         Utils.writeArrayToFile(content, filename);
@@ -1200,6 +1216,13 @@ public class UI {
             }
         } catch (IOException e) {
             Log.e(TAG, "loadPresetFromFile: ", e);
+        }
+    }
+
+    public void deleteEqPreset(File file) {
+        if (file.exists()) {
+            if (file.delete())
+                Toast.makeText(mainActivity, "Preset deleted", Toast.LENGTH_SHORT).show();
         }
     }
 }
