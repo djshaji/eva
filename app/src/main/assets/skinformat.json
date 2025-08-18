@@ -125,21 +125,21 @@
 
     "volume": {
       "name": "Volume Bar",
-      "coordinates": [107, 57, 68, 14],
+      "coordinates": [107, 57, 68, 13],
       "source": "volume.bmp",
       "type": "seekbar",
       "bg": true,
-      "source_rect": [0, 0, 68, 14],
+      "source_rect": [0, 0, 68, 13],
       "thumb": [15, 422, 14, 11]
     },
 
     "balance": {
       "name": "Balance Bar",
-      "coordinates": [174, 57, 39, 14],
+      "coordinates": [174, 57, 38, 13],
       "bg": true,
       "source": "balance.bmp",
       "type": "seekbar",
-      "source_rect": [8, 0, 39, 14],
+      "source_rect": [9, 0, 38, 13],
       "thumb": [15, 422, 14, 11]
     },
     "posbar": {
@@ -313,7 +313,7 @@
         "source": "eqmain.bmp",
         "vertical": true,
         "type": "seekbar",
-        "source_rect": [13, 164, 14, 64],
+        "source_rect": [13, 164, 14, 63],
         "thumb": [0, 164, 11, 11],
         "slider_thumb_ref": "slider_thumb"
       },
@@ -323,7 +323,7 @@
         "source": "eqmain.bmp",
         "vertical": true,
         "type": "seekbar",
-        "source_rect": [13, 164, 14, 64],
+        "source_rect": [13, 164, 14, 63],
         "thumb": [0, 164, 11, 11],
         "slider_thumb_ref": "slider_thumb"
       },
@@ -333,7 +333,7 @@
         "source": "eqmain.bmp",
         "vertical": true,
         "type": "seekbar",
-        "source_rect": [13, 164, 14, 64],
+        "source_rect": [13, 164, 14, 63],
         "thumb": [0, 164, 11, 11],
         "slider_thumb_ref": "slider_thumb"
       },
@@ -343,7 +343,7 @@
         "source": "eqmain.bmp",
         "vertical": true,
         "type": "seekbar",
-        "source_rect": [13, 164, 14, 64],
+        "source_rect": [13, 164, 14, 63],
         "thumb": [0, 164, 11, 11],
         "slider_thumb_ref": "slider_thumb"
       },
@@ -353,7 +353,7 @@
         "source": "eqmain.bmp",
         "vertical": true,
         "type": "seekbar",
-        "source_rect": [13, 164, 14, 64],
+        "source_rect": [13, 164, 14, 63],
         "thumb": [0, 164, 11, 11],
         "slider_thumb_ref": "slider_thumb"
       },
@@ -363,7 +363,7 @@
         "source": "eqmain.bmp",
         "vertical": true,
         "type": "seekbar",
-        "source_rect": [13, 164, 14, 64],
+        "source_rect": [13, 164, 14, 63],
         "thumb": [0, 164, 11, 11],
         "slider_thumb_ref": "slider_thumb"
       },
@@ -373,7 +373,7 @@
         "source": "eqmain.bmp",
         "vertical": true,
         "type": "seekbar",
-        "source_rect": [13, 164, 14, 64],
+        "source_rect": [13, 164, 14, 63],
         "thumb": [0, 164, 11, 11],
         "slider_thumb_ref": "slider_thumb"
       },
@@ -383,7 +383,7 @@
         "source": "eqmain.bmp",
         "vertical": true,
         "type": "seekbar",
-        "source_rect": [13, 164, 14, 64],
+        "source_rect": [13, 164, 14, 63],
         "thumb": [0, 164, 11, 11],
         "slider_thumb_ref": "slider_thumb"
       },
@@ -393,7 +393,7 @@
         "source": "eqmain.bmp",
         "vertical": true,
         "type": "seekbar",
-        "source_rect": [13, 164, 14, 64],
+        "source_rect": [13, 164, 14, 63],
         "thumb": [0, 164, 11, 11],
         "slider_thumb_ref": "slider_thumb"
       },
@@ -403,7 +403,7 @@
         "source": "eqmain.bmp",
         "vertical": true,
         "type": "seekbar",
-        "source_rect": [13, 164, 14, 64],
+        "source_rect": [13, 164, 14, 63],
         "thumb": [0, 164, 11, 11],
         "slider_thumb_ref": "slider_thumb"
       },
@@ -413,7 +413,7 @@
         "source": "eqmain.bmp",
         "vertical": true,
         "type": "seekbar",
-        "source_rect": [13, 164, 14, 64],
+        "source_rect": [13, 164, 14, 63],
         "thumb": [0, 164, 11, 11],
         "slider_thumb_ref": "slider_thumb"
       }

@@ -251,6 +251,7 @@ public class UI {
         mainActivity.root.addView(volume);
         balance = (SeekBar) createView(skinFormat.getJSONObject("main_window").getJSONObject("balance"));
         mainActivity.root.addView(balance);
+        balance.setTag("balance");
         posbar = (SeekBar) createView(skinFormat.getJSONObject("main_window").getJSONObject("posbar"));
         mainActivity.root.addView(posbar);
 
@@ -896,7 +897,7 @@ public class UI {
                     for (int i = 0; i < 28; i++) {
                         int y_ = y + (height * i);
                         if (i > 0)
-                            y_ = y_ + i;
+                            y_ = y_ + i + (i);
 
 //                            Log.d(TAG, String.format("[%s]: %d, %d %d %d %d", component.get("source"), i, x, y_, width, height));
                         if (y_ < 0) y_ = 0;
@@ -904,6 +905,8 @@ public class UI {
                             width = bitmap.getWidth() - x;
                         if (y_ + height > bitmap.getHeight())
                             height = bitmap.getHeight() - y_;
+                        Log.d(TAG, String.format ("[seekbar] %d x %d: %d x %d", x, y_, width, height));
+
                         Bitmap bg = Bitmap.createBitmap(bitmap, x, y_, width, height, null, true);
                         Bitmap bgs = Bitmap.createScaledBitmap(bg, (int) (swidth), (int) (sheight), true);
                         states.put(i, bgs);

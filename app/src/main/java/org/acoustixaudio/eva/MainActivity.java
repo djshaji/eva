@@ -222,27 +222,27 @@ public class MainActivity extends AppCompatActivity implements PurchasesUpdatedL
         ui.loadCurrentPlaylist();
 
         // Initialize BillingClient
-        billingClient = BillingClient.newBuilder(this)
-                .setListener(this)
-//                .enablePendingPurchases()
-                .build();
-
-        billingClient.startConnection(new BillingClientStateListener() {
-            @Override
-            public void onBillingSetupFinished(BillingResult billingResult) {
-                if (billingResult.getResponseCode() == BillingClient.BillingResponseCode.OK) {
-                    // The BillingClient is ready. You can query purchases here.
-                    Log.d(TAG, "BillingClient: Setup successful.");
-                } else {
-                    Log.e(TAG, "BillingClient: Setup failed. Response code: " + billingResult.getResponseCode());
-                }
-            }
-            @Override
-            public void onBillingServiceDisconnected() {
-                // Try to restart the connection on the next request to Google Play by calling the startConnection() method.
-                Log.w(TAG, "BillingClient: Service disconnected.");
-            }
-        });
+//        billingClient = BillingClient.newBuilder(this)
+//                .setListener(this)
+//                .enablePendingPurchases(new )
+//                .build();
+//
+//        billingClient.startConnection(new BillingClientStateListener() {
+//            @Override
+//            public void onBillingSetupFinished(BillingResult billingResult) {
+//                if (billingResult.getResponseCode() == BillingClient.BillingResponseCode.OK) {
+//                    // The BillingClient is ready. You can query purchases here.
+//                    Log.d(TAG, "BillingClient: Setup successful.");
+//                } else {
+//                    Log.e(TAG, "BillingClient: Setup failed. Response code: " + billingResult.getResponseCode());
+//                }
+//            }
+//            @Override
+//            public void onBillingServiceDisconnected() {
+//                // Try to restart the connection on the next request to Google Play by calling the startConnection() method.
+//                Log.w(TAG, "BillingClient: Service disconnected.");
+//            }
+//        });
     }
 
     public void openFilePicker(int requestCode) {
