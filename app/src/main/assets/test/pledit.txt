@@ -1,8 +1,0 @@
-[Text]
-Normal=#5863A1
-Current=#2F3553
-NormalBG=#D8DEF2
-SelectedBG=#C0C6EC
-MbFG=#BBC6DD
-MbBG=#5863A1
-Font=Copperplate Gothic Light

@@ -219,8 +219,11 @@ public class UI {
 //        mainActivity.root.addView(mainClose);
         eq_button = (ToggleButton) createView(skinFormat.getJSONObject("main_window").getJSONObject("eq_button"));
         mainActivity.root.addView(eq_button);
+        eq_button.setTag("eq_button");
         pl_button = (ToggleButton) createView(skinFormat.getJSONObject("main_window").getJSONObject("pl_button"));
         mainActivity.root.addView(pl_button);
+
+        pl_button.setTag("pl_button");
 
         prev = (Button) createView(skinFormat.getJSONObject("main_window").getJSONObject("prev"));
         mainActivity.root.addView(prev);
@@ -485,6 +488,9 @@ public class UI {
         playlistMenus();
 
         setupCallbacks();
+        shuffle.setTag("shuffle");
+        repeat.setTag("repeat");
+        auto_eq.setTag("auto_eq");
     }
 
     void setupCallbacks () {
