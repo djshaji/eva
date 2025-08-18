@@ -104,7 +104,7 @@ public class UI {
     public Button logoBtn;
 
     public Button plAdd, plRemove, plSelect, plLoad, plMisc;
-    private String defaultPlaylist;
+    String defaultPlaylist;
     private Handler handler;
     private Runnable runnable;
     ImageView m1, m2, s1, s2;

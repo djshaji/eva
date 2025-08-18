@@ -9,10 +9,12 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.webkit.WebView;
+import com.android.billingclient.api.AcknowledgePurchaseParams;
 import com.android.billingclient.api.BillingClient;
 import com.android.billingclient.api.BillingClientStateListener;
 import com.android.billingclient.api.BillingFlowParams;
 import com.android.billingclient.api.BillingResult;
+import com.android.billingclient.api.PendingPurchasesParams;
 import com.android.billingclient.api.ProductDetails;
 import com.android.billingclient.api.Purchase;
 import com.android.billingclient.api.PurchasesUpdatedListener;
@@ -159,6 +161,14 @@ public class MainActivity extends AppCompatActivity implements PurchasesUpdatedL
 
         popup = new PopupMenu(this, ui.logoBtn);
         popup.getMenuInflater().inflate(R.menu.main, popup.getMenu());
+        popup.getMenu().findItem(R.id.buy_now).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(@NonNull MenuItem menuItem) {
+                purchase();
+                return false;
+            }
+        });
+
         popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem menuItem) {
@@ -219,46 +229,62 @@ public class MainActivity extends AppCompatActivity implements PurchasesUpdatedL
             }
         });
 
+        File playlist = new File(ui.defaultPlaylist);
+        if (! playlist.exists())
+            ui.addToPlaylist(Uri.parse("https://music.shaji.in/media/No%20Destination/Rock%20and%20Roll%20will%20never%20die.mp3"));
         ui.loadCurrentPlaylist();
 
         // Initialize BillingClient
-//        billingClient = BillingClient.newBuilder(this)
-//                .setListener(this)
-//                .enablePendingPurchases(new )
-//                .build();
-//
-//        billingClient.startConnection(new BillingClientStateListener() {
-//            @Override
-//            public void onBillingSetupFinished(BillingResult billingResult) {
-//                if (billingResult.getResponseCode() == BillingClient.BillingResponseCode.OK) {
-//                    // The BillingClient is ready. You can query purchases here.
-//                    Log.d(TAG, "BillingClient: Setup successful.");
-//                } else {
-//                    Log.e(TAG, "BillingClient: Setup failed. Response code: " + billingResult.getResponseCode());
-//                }
-//            }
-//            @Override
-//            public void onBillingServiceDisconnected() {
-//                // Try to restart the connection on the next request to Google Play by calling the startConnection() method.
-//                Log.w(TAG, "BillingClient: Service disconnected.");
-//            }
-//        });
+        billingClient = BillingClient.newBuilder(this)
+                .setListener(this)
+                .enablePendingPurchases(PendingPurchasesParams.newBuilder()
+                        .enableOneTimeProducts() // For one-time products
+                        .build()).build(); // enablePendingPurchases() is important.
+
+        billingClient.startConnection(new BillingClientStateListener() {
+            @Override
+            public void onBillingSetupFinished(BillingResult billingResult) {
+                if (billingResult.getResponseCode() == BillingClient.BillingResponseCode.OK) {
+                    // The BillingClient is ready. You can query purchases here.
+                    Log.d(TAG, "BillingClient: Setup successful.");
+                } else {
+                    Log.e(TAG, "BillingClient: Setup failed. Response code: " + billingResult.getResponseCode());
+                }
+            }
+            @Override
+            public void onBillingServiceDisconnected() {
+                // Try to restart the connection on the next request to Google Play by calling the startConnection() method.
+                Log.w(TAG, "BillingClient: Service disconnected.");
+            }
+        });
     }
 
     public void openFilePicker(int requestCode) {
         Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
         String intentType = "*/*";
+
+        if (requestCode == FILE_PICKER_REQUEST_CODE) {
+            intent.setType(intentType);
+            intent.addCategory(Intent.CATEGORY_OPENABLE);
+        } else if (requestCode == AUDIO_FILE_REQUEST_CODE) {
+            intent.setType("audio/*");
+            intent.addCategory(Intent.CATEGORY_OPENABLE);
+        }
+
         if (requestCode == AUDIO_FOLDER_REQUEST_CODE) {
             intent = new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
         } else if (requestCode == LOAD_PLAYLIST_REQUEST_CODE) {
             intent.setType("application/x-eva-playlist"); // Filter for your custom playlist type
+            intent.setType(intentType);
             intent.putExtra(Intent.EXTRA_MIME_TYPES, new String[]{"application/x-eva-playlist", "audio/x-mpegurl", "audio/mpegurl"}); // Common M3U types
+            intent.addCategory(Intent.CATEGORY_OPENABLE);
         } else if (requestCode == SAVE_PLAYLIST_REQUEST_CODE) {
             intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
             intentType = "application/x-eva-playlist"; // Custom MIME type for playlist
+            intent.setType(intentType);
+            intent.addCategory(Intent.CATEGORY_OPENABLE);
         }
-        intent.addCategory(Intent.CATEGORY_OPENABLE);
-        intent.setType(intentType);
+
         try {
             startActivityForResult(intent, requestCode);
         } catch (Exception e) {
@@ -649,7 +675,7 @@ public class MainActivity extends AppCompatActivity implements PurchasesUpdatedL
     public void purchase () {
         if (billingClient.isReady()) {
             // Replace "your_product_id" with the actual product ID from Google Play Console
-            String productId = "android.test.purchased"; // Or your actual product ID
+            String productId = "coffee"; // Or your actual product ID
 
             QueryProductDetailsParams queryProductDetailsParams =
                     QueryProductDetailsParams.newBuilder()
@@ -698,12 +724,7 @@ public class MainActivity extends AppCompatActivity implements PurchasesUpdatedL
     public void onPurchasesUpdated(BillingResult billingResult, List<Purchase> purchases) {
         if (billingResult.getResponseCode() == BillingClient.BillingResponseCode.OK && purchases != null) {
             for (Purchase purchase : purchases) {
-                // Handle the purchase.
-                // Verify the purchase.
-                // Grant entitlement to the user.
-                // Acknowledge the purchase if it's a non-consumable.
-                Log.d(TAG, "onPurchasesUpdated: Purchase successful: " + purchase.getSkus().get(0));
-                Toast.makeText(this, "Purchase successful!", Toast.LENGTH_SHORT).show();
+                handlePurchase(purchase);
             }
         } else if (billingResult.getResponseCode() == BillingClient.BillingResponseCode.USER_CANCELED) {
             Log.i(TAG, "onPurchasesUpdated: User cancelled the purchase.");
@@ -711,6 +732,34 @@ public class MainActivity extends AppCompatActivity implements PurchasesUpdatedL
         } else {
             Log.e(TAG, "onPurchasesUpdated: Error during purchase. Response code: " + billingResult.getResponseCode());
             Toast.makeText(this, "Purchase error: " + billingResult.getDebugMessage(), Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void handlePurchase(Purchase purchase) {
+        // Verify the purchase.
+        // For non-consumables, acknowledge the purchase.
+        if (purchase.getPurchaseState() == Purchase.PurchaseState.PURCHASED) {
+            if (!purchase.isAcknowledged()) {
+                AcknowledgePurchaseParams acknowledgePurchaseParams =
+                        AcknowledgePurchaseParams.newBuilder()
+                                .setPurchaseToken(purchase.getPurchaseToken())
+                                .build();
+                billingClient.acknowledgePurchase(acknowledgePurchaseParams, billingResult -> {
+                    if (billingResult.getResponseCode() == BillingClient.BillingResponseCode.OK) {
+                        // Grant entitlement to the user.
+                        Log.d(TAG, "onPurchasesUpdated: Purchase acknowledged and successful: " + purchase.getSkus().get(0));
+                        new AlertDialog.Builder(MainActivity.this)
+                                .setTitle("Purchase Successful")
+                                .setMessage("Thank you for your supporting this project!")
+                                .setPositiveButton("You're welcome", (dialog, which) -> {
+                                    // You can add any further actions here if needed
+                                    dialog.dismiss();
+                                })
+                                .show();
+                        // TODO: Update UI or app state to reflect the purchase
+                    }
+                });
+            }
         }
     }
 }
