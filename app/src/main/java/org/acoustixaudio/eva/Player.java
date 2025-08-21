@@ -11,10 +11,11 @@ import androidx.annotation.OptIn;
 import androidx.media3.common.MediaItem;
 import androidx.media3.common.util.UnstableApi;
 import androidx.media3.exoplayer.ExoPlayer;
+import androidx.media3.session.MediaController;
 
 public class Player {
     private static final String TAG = "Player";
-    public final ExoPlayer player;
+    public MediaController player;
     MainActivity mainActivity;
     MediaMetadataRetriever retriever = null ;
 
@@ -23,9 +24,10 @@ public class Player {
 
     int [] eqBands = {60000, 170000, 310000, 600000, 1000000, 3000000, 6000000, 12000000, 14000000, 16000000};
 
-    @OptIn(markerClass = UnstableApi.class) Player (MainActivity _mainActivity) {
+    @OptIn(markerClass = UnstableApi.class) Player (MainActivity _mainActivity, MediaController p) {
         mainActivity = _mainActivity;
-        player = new ExoPlayer.Builder(mainActivity).build();
+//        player = new ExoPlayer.Builder(mainActivity).build();
+        player = p;
         retriever = new MediaMetadataRetriever();
         AudioEffect.Descriptor[] effects = AudioEffect.queryEffects();
         Log.d(TAG, "Supported effects:");

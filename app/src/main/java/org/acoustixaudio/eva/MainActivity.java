@@ -1,6 +1,8 @@
 package org.acoustixaudio.eva;
 
+import android.content.ComponentName;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.provider.OpenableColumns;
@@ -19,6 +21,10 @@ import com.android.billingclient.api.ProductDetails;
 import com.android.billingclient.api.Purchase;
 import com.android.billingclient.api.PurchasesUpdatedListener;
 import com.android.billingclient.api.QueryProductDetailsParams;
+import com.android.billingclient.api.QueryPurchasesParams;
+import com.google.common.util.concurrent.ListenableFuture;
+import com.google.common.util.concurrent.MoreExecutors;
+
 import android.widget.EditText;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebSettings;
@@ -53,12 +59,19 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
 import java.io.BufferedInputStream;
 import android.Manifest;
 import android.net.Uri;
+
+import androidx.media3.exoplayer.ExoPlayer;
+import androidx.media3.session.MediaController;
+import androidx.media3.session.MediaSession;
+import androidx.media3.session.SessionToken;
+
 
 public class MainActivity extends AppCompatActivity implements PurchasesUpdatedListener {
     private static final String TAG = "MainActivity";
@@ -71,20 +84,27 @@ public class MainActivity extends AppCompatActivity implements PurchasesUpdatedL
     public static final int SAVE_PLAYLIST_REQUEST_CODE = 126;
     public static final int LOAD_PLAYLIST_REQUEST_CODE = 127;
 
+    public static ExoPlayer exoPlayer;
     public ConstraintLayout root;
     private String eqPresetDir;
     Utils utils = new Utils(this);
 //    WebView webView ;
     private PopupMenu popup;
     public Player player;
+    public MediaService mediaService ;
     private BillingClient billingClient;
     private String playlistDir;
+    private boolean proVersion = false;
+    SharedPreferences sharedPreferences;
+    private MediaSession mediaSession;
+    private SessionToken sessionToken;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 //        webView = new WebView(this);
-
+        sharedPreferences = getSharedPreferences("prefs", MODE_PRIVATE);
+        proVersion = sharedPreferences.getBoolean("pro", false);
         playlistDir = getFilesDir().getAbsolutePath() + "/playlists/";
         new File (playlistDir).mkdirs();
         eqPresetDir = getFilesDir().getAbsolutePath() + "/presets/";
@@ -93,7 +113,33 @@ public class MainActivity extends AppCompatActivity implements PurchasesUpdatedL
         skinDir = getFilesDir().getAbsolutePath() + "/skin/";
         ui = new UI(this);
 
-        player = new Player (this);
+        // Start the MediaService
+        Intent serviceIntent = new Intent(this, MediaService.class);
+        startService(serviceIntent);
+
+        sessionToken =
+                new SessionToken(this, new ComponentName(this, MediaService.class));
+
+        ListenableFuture<MediaController> controllerFuture =
+                new MediaController.Builder(this, sessionToken).buildAsync();
+        controllerFuture.addListener(() -> {
+            Log.d(TAG, "onCreate: " + controllerFuture);
+            MediaController _p = null;
+            try {
+                _p = controllerFuture.get();
+            } catch (ExecutionException | InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+
+            if (_p != null) {
+                    player = new Player(this, _p);
+                    init();
+
+                } else {
+                    Log.e(TAG, "MediaController is null after buildAsync");
+                }
+        }, MoreExecutors.directExecutor());
+
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
         root = findViewById(R.id.root);
@@ -141,13 +187,19 @@ public class MainActivity extends AppCompatActivity implements PurchasesUpdatedL
             skin.load();
         }
 
+        // Initialize MediaSession
+//        mediaSession = new MediaSession.Builder(this, player.player)
+//                .build();
+    }
+
+    void init () {
         try {
             ui.create();
             ui.skin();
         } catch (JSONException e) {
+            Log.e(TAG, "Error during UI initialization", e);
             throw new RuntimeException(e);
         }
-
         ui.logoBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -235,28 +287,78 @@ public class MainActivity extends AppCompatActivity implements PurchasesUpdatedL
         ui.loadCurrentPlaylist();
 
         // Initialize BillingClient
-        billingClient = BillingClient.newBuilder(this)
-                .setListener(this)
-                .enablePendingPurchases(PendingPurchasesParams.newBuilder()
-                        .enableOneTimeProducts() // For one-time products
-                        .build()).build(); // enablePendingPurchases() is important.
+        if (! proVersion) {
+            billingClient = BillingClient.newBuilder(this)
+                    .setListener(this)
+                    .enablePendingPurchases(PendingPurchasesParams.newBuilder()
+                            .enableOneTimeProducts() // For one-time products
+                            .build()).build(); // enablePendingPurchases() is important.
 
-        billingClient.startConnection(new BillingClientStateListener() {
-            @Override
-            public void onBillingSetupFinished(BillingResult billingResult) {
-                if (billingResult.getResponseCode() == BillingClient.BillingResponseCode.OK) {
-                    // The BillingClient is ready. You can query purchases here.
-                    Log.d(TAG, "BillingClient: Setup successful.");
-                } else {
-                    Log.e(TAG, "BillingClient: Setup failed. Response code: " + billingResult.getResponseCode());
+            billingClient.startConnection(new BillingClientStateListener() {
+                @Override
+                public void onBillingSetupFinished(BillingResult billingResult) {
+                    if (billingResult.getResponseCode() == BillingClient.BillingResponseCode.OK) {
+                        // The BillingClient is ready. You can query purchases here.
+                        Log.d(TAG, "BillingClient: Setup successful.");
+                        checkIfUserHasPurchased();
+
+                    } else {
+                        Log.e(TAG, "BillingClient: Setup failed. Response code: " + billingResult.getResponseCode());
+                    }
                 }
+
+                @Override
+                public void onBillingServiceDisconnected() {
+                    // Try to restart the connection on the next request to Google Play by calling the startConnection() method.
+                    Log.w(TAG, "BillingClient: Service disconnected.");
+                }
+            });
+        } else {
+            MenuItem buyNowItem = popup.getMenu().findItem(R.id.buy_now);
+            if (buyNowItem != null) {
+                buyNowItem.setEnabled(false); // Hide the buy now button
+                buyNowItem.setTitle("Premium");
             }
-            @Override
-            public void onBillingServiceDisconnected() {
-                // Try to restart the connection on the next request to Google Play by calling the startConnection() method.
-                Log.w(TAG, "BillingClient: Service disconnected.");
-            }
-        });
+        }
+
+    }
+
+    private void checkIfUserHasPurchased() {
+        Log.d(TAG, "checkIfUserHasPurchased() called");
+        QueryPurchasesParams queryPurchasesParams = QueryPurchasesParams.newBuilder()
+                .setProductType(BillingClient.ProductType.INAPP)
+                .build();
+        billingClient.queryPurchasesAsync(
+                queryPurchasesParams,
+                (billingResult, purchasesList) -> {
+                    if (billingResult.getResponseCode() == BillingClient.BillingResponseCode.OK) {
+                        Log.d(TAG, "checkIfUserHasPurchased: " + purchasesList);
+                        if (purchasesList != null && !purchasesList.isEmpty()) {
+                            for (Purchase purchase : purchasesList) {
+                                if (purchase.getPurchaseState() == Purchase.PurchaseState.PURCHASED) {
+                                    // User has already purchased the item
+                                    Log.d(TAG, "User has already purchased: " + purchase.getSkus().get(0));
+                                    proVersion = true ;
+                                    sharedPreferences.edit().putBoolean("pro", true).apply();
+                                    // Update UI or app state accordingly
+                                    // For example, hide the "Buy Now" button or unlock premium features
+                                    runOnUiThread(() -> {
+                                        MenuItem buyNowItem = popup.getMenu().findItem(R.id.buy_now);
+                                        if (buyNowItem != null) {
+                                            buyNowItem.setVisible(false); // Hide the buy now button
+                                        }
+                                        // You might want to show a thank you message or enable features
+                                    });
+                                    return; // Assuming only one relevant non-consumable product
+                                }
+                            }
+                        }
+                        Log.d(TAG, "User has not purchased the item.");
+                    } else {
+                        Log.e(TAG, "checkIfUserHasPurchased: Error querying purchases. Response code: " + billingResult.getResponseCode());
+                    }
+                }
+        );
     }
 
     public void openFilePicker(int requestCode) {
@@ -760,6 +862,34 @@ public class MainActivity extends AppCompatActivity implements PurchasesUpdatedL
                     }
                 });
             }
+        }
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+//        player.player.stop();
+        Log.d(TAG, "onStop() called");
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+//        player.player.stop();
+        // It's generally not recommended to stop playback in onPause unless absolutely necessary.
+        // MediaSession handles background playback and notifications.
+        Log.d(TAG, "onPause() called");
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (mediaSession != null) {
+            mediaSession.release();
+            mediaSession = null;
+        }
+        if (player != null) {
+            player.player.release(); // Release the ExoPlayer instance
         }
     }
 }
