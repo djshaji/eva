@@ -2,6 +2,7 @@
 <div  class="d-flex flex-justify-center" >
 <a href="https://play.google.com/store/apps/details?id=org.acoustixaudio.eva&hl=en_IN"><img width="270" height="80" alt="GetItOnGooglePlay_Badge_Web_color_English" src="https://github.com/user-attachments/assets/b45ac0a7-9294-4f34-af51-c45286fadf89" /></a>
 </div>
+
 ![Screenshot_2025-08-18_22-09-22 jpg-small](https://github.com/user-attachments/assets/924b67b6-b4a3-4624-aca9-7bca57a283bb)
 ![Screenshot_2025-08-18_22-10-07 jpg-small](https://github.com/user-attachments/assets/09fddc69-b221-412c-b2ab-88c130a23bf5)
 ![Screenshot_2025-08-18_22-10-30 jpg-small](https://github.com/user-attachments/assets/868aa18a-cc51-43ab-a969-9f889d593834)
