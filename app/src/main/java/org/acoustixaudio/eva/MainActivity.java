@@ -321,6 +321,15 @@ public class MainActivity extends AppCompatActivity implements PurchasesUpdatedL
             }
         }
 
+        popup.getMenu().findItem(R.id.about).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(@NonNull MenuItem menuItem) {
+                Intent intent = new Intent(MainActivity.this, About.class);
+                startActivity(intent);
+                return false;
+            }
+        });
+
         popupMenu();
     }
 

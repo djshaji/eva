@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">AX Classic Audio Player</string>
+    <string name="about">
+        <b>Musician, Rockstar, Wanderer\n </b>
+        This app is open source
+    </string>
 </resources>

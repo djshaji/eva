@@ -4,6 +4,9 @@
         android:id="@+id/buy_now"
         android:title="Buy me a coffee"/>
     <item
+        android:id="@+id/about"
+        android:title="About"/>
+    <item
         android:id="@+id/shaji_menu"
         android:title="Shaji's Music">
         <menu>
