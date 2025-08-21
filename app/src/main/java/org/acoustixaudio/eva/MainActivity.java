@@ -321,6 +321,7 @@ public class MainActivity extends AppCompatActivity implements PurchasesUpdatedL
             }
         }
 
+        popupMenu();
     }
 
     private void checkIfUserHasPurchased() {

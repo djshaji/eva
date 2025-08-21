@@ -836,15 +836,16 @@ public class UI {
 
             if (view instanceof ToggleButton) {
                 HashMap <Integer, Bitmap> states = new HashMap<>();
-                states.put(1, scaledBitmap);
+                states.put(0, scaledBitmap);
                 Bitmap toggled = getCroppedScaledBitmap(bitmap, component.getJSONArray("source_rect_on"));
-                states.put(0, toggled);
+                states.put(1, toggled);
                 mainActivity.skin.states.put(component.getString("name"), states);
                 ToggleButton toggleButton = (ToggleButton) view;
                 toggleButton.setOnCheckedChangeListener(new ToggleButton.OnCheckedChangeListener() {
                     final String name = component.getString("name") ;
                     @Override
                     public void onCheckedChanged(@NonNull CompoundButton compoundButton, boolean b) {
+                        Log.d(TAG, "onCheckedChanged: " + String.format("%s: %b", name, b));
                         if (b) {
                             compoundButton.setBackground(new BitmapDrawable(mainActivity.getResources(), mainActivity.skin.states.get(name).get(1)));
                         } else {
@@ -852,7 +853,7 @@ public class UI {
                         }
 
                         if (compoundButton.getTag().equals("eq_toggle")) {
-                            mainActivity.player.equalizer.setEnabled(!b);
+                            mainActivity.player.equalizer.setEnabled(b);
                         }
                     }
                 });
@@ -1109,7 +1110,8 @@ public class UI {
                     s2.setImageDrawable(null);
                     displayBar.setText("");
                     Log.d(TAG, "onPlaybackStateChanged: stopping");
-                    playNext();
+                    if (playbackState == Player.STATE_ENDED)
+                        playNext();
                 }
             }
 
@@ -1195,11 +1197,17 @@ public class UI {
         View view = null;
         if (playlistAdapter.nowPlaying < songsList.size() - 1) {
             view = layoutManager.findViewByPosition(playlistAdapter.nowPlaying + 1);
-        } else if (repeat.isChecked())
+            Log.d(TAG, "playNext: " + (playlistAdapter.nowPlaying + 1));
+        } else if (repeat.isChecked()) {
             view = layoutManager.findViewByPosition(0);
+            Log.d(TAG, "playNext: 0");
+        }
 
         if (view != null)
             view.performClick();
+        else {
+            Log.d(TAG, "playNext: no track! " + repeat.isChecked());
+        }
     }
 
     public void playPrevious () {
