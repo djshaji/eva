@@ -10,6 +10,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.webkit.URLUtil;
 import android.webkit.WebView;
 import com.android.billingclient.api.AcknowledgePurchaseParams;
 import com.android.billingclient.api.BillingClient;
@@ -42,6 +43,7 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.app.ActivityCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import org.json.JSONArray;
@@ -140,13 +142,16 @@ public class MainActivity extends AppCompatActivity implements PurchasesUpdatedL
                 }
         }, MoreExecutors.directExecutor());
 
-        EdgeToEdge.enable(this);
+//        EdgeToEdge.enable(this);
+        WindowCompat.setDecorFitsSystemWindows(getWindow(), false); // This is the key call!
         setContentView(R.layout.activity_main);
         root = findViewById(R.id.root);
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.root), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
+            Log.d(TAG, "onCreate: [insets] " + systemBars);
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom - 20);
+            skin.insets = systemBars;
             return insets;
         });
 
@@ -902,4 +907,31 @@ public class MainActivity extends AppCompatActivity implements PurchasesUpdatedL
             player.player.release(); // Release the ExoPlayer instance
         }
     }
+
+    public void showOpenUrlDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Open URL");
+
+        final EditText input = new EditText(this);
+        input.setHint("Enter URL (http(s)://...)");
+        builder.setView(input);
+
+        builder.setPositiveButton("Open", (dialog, which) -> {
+            String url = input.getText().toString().trim();
+            if (!url.isEmpty()) {
+                if (URLUtil.isValidUrl(url)) {
+                    ui.addToPlaylist(Uri.parse(url));
+                    Toast.makeText(this, "Added to playlist: " + url, Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(this, "Invalid URL", Toast.LENGTH_SHORT).show();
+                }
+            } else {
+                Toast.makeText(this, "Please enter a URL", Toast.LENGTH_SHORT).show();
+            }
+        });
+        builder.setNegativeButton("Cancel", (dialog, which) -> dialog.cancel());
+        builder.show();
+    }
+
+
 }

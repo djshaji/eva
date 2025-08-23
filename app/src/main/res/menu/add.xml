@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/pl_add_url"
+        android:title="Add URL"/>
     <item
         android:id="@+id/pl_add_file"
         android:title="Add file"/>

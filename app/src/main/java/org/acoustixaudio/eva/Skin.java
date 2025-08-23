@@ -6,7 +6,8 @@ import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.util.DisplayMetrics;
 import android.util.Log;
-import android.widget.ImageView;
+
+import androidx.core.graphics.Insets;
 
 import org.json.JSONObject;
 
@@ -22,6 +23,7 @@ public class Skin {
     String defaultSkinDir = "classic/";
     float scale = 1.0f;
     DisplayMetrics metrics ;
+    Insets insets ;
     HashMap <String, JSONObject> inis = new HashMap<>();
     HashMap <String, BitmapDrawable> skin = new HashMap<>();
     HashMap <String, HashMap<Integer, Bitmap>> states ;
@@ -153,5 +155,13 @@ public class Skin {
             }
         }
         return value;
+    }
+
+    public int getSystemNavigationBarHeight () {
+        int resourceId = mainActivity.getResources().getIdentifier("navigation_bar_height", "dimen", "android");
+        if (resourceId > 0) {
+            return mainActivity.getResources().getDimensionPixelSize(resourceId);
+        }
+        return 0;
     }
 }

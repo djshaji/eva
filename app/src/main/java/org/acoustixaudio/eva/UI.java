@@ -345,6 +345,9 @@ public class UI {
         }
 
         int statusBar = (int) ((int) Utils.getStatusBarHeight(mainActivity.getResources()) / mainActivity.skin.scale) + 20; // for some reason bottom of playlist is cut off
+        int inset = (int) (mainActivity.skin.insets.bottom / mainActivity.skin.scale) + (int) (mainActivity.skin.insets.bottom / mainActivity.skin.scale);
+//        statusBar = inset ;
+        Log.d(TAG, "create: [inset] " + statusBar + ' ' + inset);
         JSONObject bleft = skinFormat.getJSONObject("playlist").getJSONObject("titlebar").getJSONObject("bleft");
 
         recyclerView = new RecyclerView(mainActivity);
@@ -653,6 +656,14 @@ public class UI {
             @Override
             public void onClick(View view) {
                 mLoad.show();
+            }
+        });
+
+        mAdd.getMenu().findItem(R.id.pl_add_url).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(@NonNull MenuItem menuItem) {
+                mainActivity.showOpenUrlDialog();
+                return false;
             }
         });
 
@@ -1255,4 +1266,5 @@ public class UI {
                 Toast.makeText(mainActivity, "Preset deleted", Toast.LENGTH_SHORT).show();
         }
     }
+
 }
