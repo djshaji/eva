@@ -28,12 +28,18 @@ public class Player {
         mainActivity = _mainActivity;
 //        player = new ExoPlayer.Builder(mainActivity).build();
         player = p;
+        equalizer = MediaService.equalizer;
+        loudnessEnhancer = MediaService.loudnessEnhancer;
         retriever = new MediaMetadataRetriever();
         AudioEffect.Descriptor[] effects = AudioEffect.queryEffects();
         Log.d(TAG, "Supported effects:");
         for (AudioEffect.Descriptor effect : effects) {
             Log.d(TAG, "  " + effect.name + " (" + effect.implementor + ")");
         }
+
+    }
+
+    public void init () {
 
     }
 

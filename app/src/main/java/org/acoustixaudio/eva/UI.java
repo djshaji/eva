@@ -32,6 +32,7 @@ import android.graphics.drawable.Drawable;
 import android.media.audiofx.Equalizer;
 import android.media.audiofx.LoudnessEnhancer;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Handler;
 import android.util.Log;
 import android.view.Menu;
@@ -452,7 +453,9 @@ public class UI {
 
         volume.setProgress(100);
         balance.setProgress(50);
-        posbar.setThumbTintBlendMode(BlendMode.CLEAR);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            posbar.setThumbTintBlendMode(BlendMode.CLEAR);
+        }
         posbar.setProgress(0);
 
         posbar.setVisibility(View.GONE);
