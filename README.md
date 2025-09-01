@@ -1,4 +1,5 @@
 ![eva-header](https://github.com/user-attachments/assets/ee685bf2-d743-4004-9aa2-7860f34f458e)
+Standalone version
 <div  class="d-flex flex-justify-center" >
 <a href="https://play.google.com/store/apps/details?id=org.acoustixaudio.eva&hl=en_IN"><img width="270" height="80" alt="GetItOnGooglePlay_Badge_Web_color_English" src="https://github.com/user-attachments/assets/b45ac0a7-9294-4f34-af51-c45286fadf89" /></a>
 </div>
