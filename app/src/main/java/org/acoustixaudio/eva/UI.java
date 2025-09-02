@@ -52,6 +52,7 @@ import android.widget.ToggleButton;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
@@ -625,6 +626,14 @@ public class UI {
             @Override
             public void onClick(View view) {
                 mMisc.show();
+            }
+        });
+
+        mMisc.getMenu().findItem(R.id.randomize_list).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(@NonNull MenuItem menuItem) {
+                shuffleList();
+                return false;
             }
         });
 
@@ -1209,7 +1218,10 @@ public class UI {
 
     public void playNext () {
         View view = null;
-        if (playlistAdapter.nowPlaying < songsList.size() - 1) {
+        if (shuffle.isChecked()) {
+            Random random = new Random();
+            view = layoutManager.findViewByPosition(random.nextInt(songsList.size()));
+        } else if (playlistAdapter.nowPlaying < songsList.size() - 1) {
             view = layoutManager.findViewByPosition(playlistAdapter.nowPlaying + 1);
             Log.d(TAG, "playNext: " + (playlistAdapter.nowPlaying + 1));
         } else if (repeat.isChecked()) {
@@ -1270,4 +1282,8 @@ public class UI {
         }
     }
 
+    public void shuffleList () {
+        Collections.shuffle(songsList);
+        playlistAdapter.notifyDataSetChanged();
+    }
 }

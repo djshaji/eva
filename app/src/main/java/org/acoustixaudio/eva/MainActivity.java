@@ -1,6 +1,7 @@
 package org.acoustixaudio.eva;
 
 import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
@@ -77,6 +78,7 @@ import androidx.media3.session.SessionToken;
 
 public class MainActivity extends AppCompatActivity implements PurchasesUpdatedListener {
     private static final String TAG = "MainActivity";
+    Context context ;
     Skin skin;
     String skinDir = null ;
     org.acoustixaudio.eva.UI ui;
@@ -105,6 +107,7 @@ public class MainActivity extends AppCompatActivity implements PurchasesUpdatedL
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 //        webView = new WebView(this);
+        context = this ;
         sharedPreferences = getSharedPreferences("prefs", MODE_PRIVATE);
         proVersion = sharedPreferences.getBoolean("pro", false);
         playlistDir = getFilesDir().getAbsolutePath() + "/playlists/";
@@ -443,8 +446,13 @@ public class MainActivity extends AppCompatActivity implements PurchasesUpdatedL
         if (requestCode == AUDIO_FILE_REQUEST_CODE && resultCode == RESULT_OK) {
             Uri uri = data.getData();
             String filename = getFileNameFromUri(uri);
-            ui.addToPlaylist(uri);
-            getContentResolver().takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            DocumentFile documentFile = DocumentFile.fromSingleUri(this, uri);
+            if (documentFile != null && documentFile.getType() != null && documentFile.getType().startsWith("audio/")) {
+                ui.addToPlaylist(uri);
+                getContentResolver().takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            } else {
+                Toast.makeText(context, "Not an audio file", Toast.LENGTH_SHORT).show();
+            }
             return;
         }
 
@@ -452,17 +460,7 @@ public class MainActivity extends AppCompatActivity implements PurchasesUpdatedL
             Uri uri = data.getData();
             getContentResolver().takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
             // Assuming 'uri' is the URI of the selected folder
-            DocumentFile documentFile = DocumentFile.fromTreeUri(this, uri);
-            if (documentFile != null && documentFile.isDirectory()) {
-                DocumentFile[] files = documentFile.listFiles();
-                for (DocumentFile file : files) {
-                    if (file.isFile()) {
-                        // Handle each file, e.g., add to playlist
-                        Log.d(TAG, "onActivityResult: File in folder: " + file.getName() + " URI: " + file.getUri());
-                        ui.addToPlaylist(file.getUri());
-                    }
-                }
-            }
+            addFilesFromDirectory(DocumentFile.fromTreeUri(this, uri));
             return;
         }
 
@@ -501,6 +499,22 @@ public class MainActivity extends AppCompatActivity implements PurchasesUpdatedL
                 }
             }
             return;
+        }
+    }
+
+    private void addFilesFromDirectory(DocumentFile directory) {
+        if (directory != null && directory.isDirectory()) {
+            DocumentFile[] files = directory.listFiles();
+            for (DocumentFile file : files) {
+                if (file.isDirectory()) {
+                    addFilesFromDirectory(file); // Recursively add files from subdirectories
+                } else if (file.isFile()) {
+                    Log.d(TAG, "addFilesFromDirectory: File in folder: " + file.getName() + " URI: " + file.getUri());
+                    Log.d(TAG, "addFilesFromDirectory: " + file.getUri() + ' ' + file.getType());
+                    if (file.getType() != null && file.getType().startsWith("audio/"))
+                        ui.addToPlaylist(file.getUri());
+                }
+            }
         }
     }
 
@@ -636,12 +650,14 @@ public class MainActivity extends AppCompatActivity implements PurchasesUpdatedL
             if (files != null) {
                 for (File file : files) {
                     if (file.isFile()) { // Check if it's a file (not a subdirectory)
+                        Log.d(TAG, "getFilesFromFolder: [file] " + file.getName());
                         fileList.add(file);
                     }
                     // If you also want to list files in subdirectories recursively:
-                    // else if (file.isDirectory()) {
-                    //     fileList.addAll(getFilesFromFolder(file.getAbsolutePath()));
-                    // }
+                     else if (file.isDirectory()) {
+                         Log.d(TAG, "getFilesFromFolder: [dir] " + file.getName());
+                         fileList.addAll(getFilesFromFolder(file.getAbsolutePath()));
+                     }
                 }
             }
         } else {
